@@ -212,23 +212,30 @@
         white-space: normal !important;
       }
       
-      /* GRAF - Santai size untuk print */
-      canvas { 
-        max-height: 180px !important;
-        max-width: 100% !important;
-        height: 180px !important;
+      /* GRAF - compact print layout matching screenshot */
+      .chart-wrap {
+        height: 220px !important;
+        max-height: 220px !important;
         width: 100% !important;
-        page-break-inside: avoid;
-        display: block !important;
-        margin: 10px 0 !important;
-      }
-      
-      .chart-container,
-      div:has(> canvas) {
-        max-height: 480px !important;
-        height: 480px !important;
-        page-break-inside: avoid;
         padding: 0 !important;
+        margin: 8px 0 !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 4px !important;
+        background: #fff !important;
+        page-break-inside: avoid;
+      }
+
+      canvas {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 220px !important;
+      }
+
+      /* Dashboard charts (line/bar) — keep them tighter too */
+      .h-64 {
+        height: 180px !important;
+        max-height: 180px !important;
       }
       
       /* HIDE ULASAN LABEL ONLY - KEEP CONTENT */
@@ -1030,6 +1037,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          devicePixelRatio: 2,
           interaction: {
             intersect: false,
             mode: 'index'
@@ -1114,6 +1122,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          devicePixelRatio: 2,
           plugins: {
             legend: { display: false }
           },
@@ -1498,7 +1507,7 @@
             </button>
 
             <div class="mt-6">
-              <div class="h-64 bg-slate-50 p-2 rounded-xl border-2 mb-4">
+              <div class="chart-wrap" style="height:280px; background:#f8fafc; border-radius:0.75rem; border:2px solid #e2e8f0; margin-bottom:1rem;">
                 <canvas id="chart-${sec.id}"></canvas>
               </div>
               <div>
@@ -1872,12 +1881,13 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          devicePixelRatio: 2,
           layout: {
             padding: {
-              left: 5,
-              right: 5,
-              top: 25,
-              bottom: 5
+              left: 2,
+              right: 2,
+              top: 20,
+              bottom: 2
             }
           },
           plugins: {
@@ -1886,8 +1896,8 @@
               display: true,
               anchor: 'end',
               align: 'top',
-              offset: 4,
-              font: { weight: 'bold', size: 14 },
+              offset: 2,
+              font: { weight: 'bold', size: 13, family: 'Calibri, Arial, sans-serif' },
               color: '#1e40af',
               formatter: (val) => val || 0
             }
@@ -1905,7 +1915,7 @@
                 width: 2
               },
               ticks: { 
-                font: { weight: 'bold', size: 12 },
+                font: { weight: 'bold', size: 12, family: 'Calibri, Arial, sans-serif' },
                 color: '#000000',
                 padding: 5
               }
@@ -1921,7 +1931,7 @@
                 width: 2
               },
               ticks: { 
-                font: { weight: 'bold', size: 10 },
+                font: { weight: 'bold', size: 10, family: 'Calibri, Arial, sans-serif' },
                 color: '#000000',
                 padding: 5,
                 maxRotation: 0,
