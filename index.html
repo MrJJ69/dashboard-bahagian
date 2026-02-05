@@ -1499,7 +1499,7 @@
             </button>
 
             <div class="mt-6">
-              <div style="height: 240px; padding: 0; margin: 0 0 1rem 0; position: relative;" class="bg-slate-50 rounded-xl border-2 overflow-hidden">
+              <div style="height: 280px; padding: 8px; margin: 0 0 1rem 0; position: relative;" class="bg-slate-50 rounded-xl border-2">
                 <canvas id="chart-${sec.id}" style="display: block; width: 100% !important; height: 100% !important;"></canvas>
               </div>
               <div>
@@ -1875,10 +1875,10 @@
           maintainAspectRatio: false,
           layout: {
             padding: {
-              left: 0,
-              right: 0,
-              top: 15,
-              bottom: 0
+              left: 5,
+              right: 5,
+              top: 20,
+              bottom: 5
             }
           },
           plugins: {
@@ -1886,14 +1886,14 @@
               display: true,
               text: sec.title,
               font: { 
-                size: 14,
+                size: 13,
                 weight: 'bold',
                 family: 'Calibri, Arial, sans-serif'
               },
               color: '#1e3a8a',
               padding: {
-                top: 5,
-                bottom: 10
+                top: 0,
+                bottom: 8
               }
             },
             legend: { display: false },
@@ -1901,8 +1901,8 @@
               display: true,
               anchor: 'end',
               align: 'top',
-              offset: 4,
-              font: { weight: 'bold', size: 14 },
+              offset: 2,
+              font: { weight: 'bold', size: 12 },
               color: '#1e40af',
               formatter: (val) => val || 0
             }
@@ -1920,9 +1920,9 @@
                 width: 2
               },
               ticks: { 
-                font: { weight: 'bold', size: 12 },
+                font: { weight: 'bold', size: 11 },
                 color: '#000000',
-                padding: 5
+                padding: 3
               }
             },
             x: { 
@@ -1936,12 +1936,37 @@
                 width: 2
               },
               ticks: { 
-                font: { weight: 'bold', size: 10 },
+                font: { weight: 'bold', size: 8 },
                 color: '#000000',
-                padding: 5,
+                padding: 2,
                 maxRotation: 0,
                 minRotation: 0,
-                autoSkip: false
+                autoSkip: false,
+                // WRAP TEXT callback
+                callback: function(value, index, ticks) {
+                  const label = this.getLabelForValue(value);
+                  const maxChars = 12;
+                  
+                  if (label.length <= maxChars) return label;
+                  
+                  // Split into words and wrap
+                  const words = label.split(' ');
+                  const lines = [];
+                  let currentLine = '';
+                  
+                  words.forEach(word => {
+                    const testLine = currentLine ? currentLine + ' ' + word : word;
+                    if (testLine.length <= maxChars) {
+                      currentLine = testLine;
+                    } else {
+                      if (currentLine) lines.push(currentLine);
+                      currentLine = word;
+                    }
+                  });
+                  if (currentLine) lines.push(currentLine);
+                  
+                  return lines;
+                }
               }
             }
           }
