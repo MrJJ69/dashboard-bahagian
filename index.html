@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ms">
 <head>
@@ -109,51 +110,16 @@
 
     /* HANYA UBAH DI SINI UNTUK PRINT */
     @media print {
-      @page { 
-        size: A4 portrait; 
-        margin: 0.5cm 0.3cm 0.5cm 0.3cm;
-      }
+      @page { size: A4 portrait; margin: 1.5cm; }
       
-      body { 
-        background: white !important; 
-        margin: 0 !important; 
-        padding: 0 !important; 
-        font-size: 8.5pt !important;
-        line-height: 1.1 !important;
-      }
-      
-      .no-print { 
-        display: none !important; 
-      }
-      
-      main { 
-        width: 100% !important; 
-        padding: 0 !important; 
-        margin: 0 !important; 
-      }
-      
+      body { background: white !important; margin: 0; padding: 0; }
+      .no-print { display: none !important; }
+      main { width: 100% !important; padding: 0 !important; margin: 0 !important; }
       .report-page { 
         box-shadow: none !important; 
         padding: 0 !important;
-        margin: 0 !important;
         background: white !important;
         border-radius: 0 !important;
-        width: 100% !important;
-      }
-      
-      .report-header {
-        text-align: left !important;
-        margin-bottom: 0.3cm !important;
-        padding: 0 !important;
-      }
-      
-      .report-header h1, 
-      .report-header h2, 
-      .report-header h3 {
-        font-size: 9pt !important;
-        margin-bottom: 0.05cm !important;
-        line-height: 1.1 !important;
-        page-break-after: avoid;
       }
       
       .section-container {
@@ -162,9 +128,9 @@
         box-shadow: none !important;
         border: none !important;
         padding: 0 !important;
-        margin: 0 0 0.2cm 0 !important;
+        margin-bottom: 10px !important;
+        page-break-before: always !important;
         page-break-inside: avoid !important;
-        page-break-before: auto !important;
       }
       
       .section-container:first-child {
@@ -177,50 +143,40 @@
         border: none !important;
         border-radius: 0 !important;
         padding: 0 !important;
-        margin: 0.1cm 0 0.05cm 0 !important;
+        margin-bottom: 5px !important;
         font-weight: bold !important;
-        font-size: 9pt !important;
-        text-transform: uppercase;
-        display: block !important;
       }
       
-      /* Jadual lebih padat */
+      /* Force table to wrap text properly */
       table { 
         table-layout: fixed !important; 
         width: 100% !important;
         border-collapse: collapse !important;
-        margin: 0.05cm 0 0.1cm 0 !important;
-        page-break-inside: avoid !important;
       }
       
       th, td { 
         word-wrap: break-word !important; 
         overflow-wrap: break-word !important; 
         white-space: normal !important; 
-        font-size: 7.5pt !important;
-        padding: 1px 2px !important;
-        line-height: 1 !important;
-        border: 0.5px solid #000000 !important;
+        font-size: 8pt !important;
+        padding: 3px !important;
+        line-height: 1.3 !important;
+        border: 1px solid #000000 !important;
         text-align: left !important;
-        height: auto !important;
-        min-height: auto !important;
-        vertical-align: middle !important;
       }
       
       th {
-        background: #f0f0f0 !important;
+        background: white !important;
         color: black !important;
         font-weight: bold !important;
         text-align: center !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-        padding: 2px !important;
       }
       
       /* First column left align with more width */
       td:first-child, th:first-child {
         width: 30% !important;
-        max-width: 30% !important;
         word-break: break-word !important;
         text-align: left !important;
       }
@@ -228,40 +184,17 @@
       /* Number columns center align */
       td:not(:first-child) {
         text-align: center !important;
-        width: 6% !important;
-        max-width: 6% !important;
-      }
-      
-      /* Last column (kumulatif) lebih lebar */
-      td:nth-last-child(2) {
-        width: 8% !important;
-        max-width: 8% !important;
       }
       
       /* Jumlah row */
       .jumlah-row {
-        background: #f0f0f0 !important;
-        border-top: 1.5px solid #000000 !important;
+        background: white !important;
+        border-top: 2px solid #000000 !important;
       }
       
       .jumlah-row td {
         font-weight: bold !important;
-        border: 0.5px solid #000000 !important;
-        background: #f0f0f0 !important;
-      }
-      
-      /* Kumulatif column styling */
-      .kumulatif-col {
-        background: #f8f8f8 !important;
-        color: #000000 !important;
-        font-weight: bold !important;
-      }
-      
-      /* Jumlah column styling */
-      .jumlah-col {
-        background: #e8e8e8 !important;
-        color: #000000 !important;
-        font-weight: bold !important;
+        border: 1px solid #000000 !important;
       }
       
       /* CRITICAL: Hide input fields and show text only */
@@ -271,20 +204,6 @@
         border: none !important;
         background: transparent !important;
         width: 100% !important;
-        height: auto !important;
-        min-height: auto !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        display: none !important;
-      }
-      
-      /* Show the value inside input for print */
-      td input::after {
-        content: attr(value);
-        font-size: 7.5pt !important;
-        color: black !important;
-        display: block;
-        text-align: center;
       }
       
       /* For contenteditable cells */
@@ -292,51 +211,35 @@
         word-wrap: break-word !important;
         word-break: break-word !important;
         white-space: normal !important;
-        min-height: auto !important;
-        height: auto !important;
       }
       
-      /* GRAF - size lebih kecil untuk print */
+      /* GRAF - Fixed size untuk fit dalam 1 page */
       canvas { 
-        max-height: 100px !important;
+        max-height: 200px !important;
         max-width: 100% !important;
-        height: 100px !important;
-        width: 100% !important;
+        height: 200px !important;
+        width: auto !important;
         page-break-inside: avoid;
         display: block !important;
-        margin: 0.05cm 0 0.1cm 0 !important;
-        padding: 0 !important;
+        margin: 10px auto !important;
       }
       
       .chart-container,
       div:has(> canvas) {
-        max-height: 110px !important;
-        height: 110px !important;
+        max-height: 220px !important;
+        height: 220px !important;
         page-break-inside: avoid;
-        padding: 0 !important;
-        margin: 0.05cm 0 0.1cm 0 !important;
       }
       
-      /* Hide ULASAN textarea */
-      textarea { 
-        display: none !important; 
-      }
-      
-      /* Hide ULASAN label */
-      label.block.text-sm.font-bold.text-slate-700.mb-2 {
-        display: none !important;
-      }
+      /* HIDE ULASAN LABEL ONLY - KEEP CONTENT */
+      textarea { display: none !important; }
       
       /* Show ulasan content */
       .ulasan-print { 
         display: block !important;
         white-space: pre-wrap;
-        margin: 0.05cm 0 0.15cm 0 !important;
-        line-height: 1.2;
-        font-size: 8pt !important;
-        page-break-inside: avoid;
-        border-top: 0.5px dashed #999 !important;
-        padding-top: 0.05cm !important;
+        margin-top: 10px;
+        line-height: 1.5;
       }
       
       /* Hide ONLY the "ULASAN:" label */
@@ -344,39 +247,9 @@
         display: none !important; 
       }
       
-      /* Remove all extra spaces */
-      * {
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
-        box-sizing: border-box !important;
-      }
-      
-      /* Pastikan baris tidak terputus dalam sel */
-      td, th {
-        page-break-inside: avoid !important;
-        page-break-before: auto !important;
-      }
-      
-      /* Elakkan graf terputus */
-      .section-container:has(canvas) {
-        page-break-inside: avoid !important;
-        page-break-before: auto !important;
-      }
-      
-      /* Untuk seksyen yang panjang, pastikan tidak terputus di tengah jadual */
-      table, tbody, tr {
-        page-break-inside: avoid !important;
-      }
-      
-      /* Remove any gaps in print */
-      br {
-        line-height: 0.8 !important;
-      }
-      
-      /* Force compact layout */
-      div, p, span {
-        max-height: none !important;
-        height: auto !important;
+      /* Hide label that says "ULASAN" */
+      label.block.text-sm.font-bold.text-slate-700.mb-2 {
+        display: none !important;
       }
     }
 
@@ -1180,33 +1053,13 @@
           scales: {
             y: {
               beginAtZero: true,
-              grid: { 
-                display: false,
-                drawBorder: true
-              },
-              border: {
-                display: true,
-                color: '#000000',
-                width: 2
-              },
-              ticks: { 
-                font: { weight: 'bold' },
-                color: '#000000'
-              }
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: { font: { weight: 'bold' } }
             },
             x: {
-              grid: { 
-                display: false,
-                drawBorder: true
-              },
-              border: {
-                display: true,
-                color: '#000000',
-                width: 2
-              },
+              grid: { display: false },
               ticks: { 
                 font: { weight: 'bold', size: 10 },
-                color: '#000000',
                 maxRotation: 90,
                 minRotation: 90
               }
@@ -1245,37 +1098,7 @@
             legend: { display: false }
           },
           scales: {
-            y: { 
-              beginAtZero: true,
-              grid: {
-                display: false,
-                drawBorder: true
-              },
-              border: {
-                display: true,
-                color: '#000000',
-                width: 2
-              },
-              ticks: {
-                font: { weight: 'bold' },
-                color: '#000000'
-              }
-            },
-            x: {
-              grid: {
-                display: false,
-                drawBorder: true
-              },
-              border: {
-                display: true,
-                color: '#000000',
-                width: 2
-              },
-              ticks: {
-                font: { weight: 'bold' },
-                color: '#000000'
-              }
-            }
+            y: { beginAtZero: true }
           }
         }
       });
@@ -1459,10 +1282,9 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-4 flex-1">
               <div class="text-2xl font-black text-blue-600">${sectionLabels[idx]}.</div>
-              <input type="text" value="${sec.title.replace(/"/g, '&quot;')}" 
-                     oninput="sections[${idx}].title = this.value; persistentData['${sec.id}'].title = this.value; autoSave(); renderReport();"
-                     class="flex-1 p-3 border-2 border-slate-200 rounded-lg font-bold text-lg hover:border-blue-300 transition"
-                     placeholder="Masukkan tajuk seksyen">
+              <input value="${sec.title}" 
+                     oninput="sections[${idx}].title = this.value; persistentData['${sec.id}'].title = this.value; autoSave();"
+                     class="flex-1 p-3 border-2 border-slate-200 rounded-lg font-bold text-lg hover:border-blue-300 transition">
               ${typeBadges[sec.type || 'standard']}
             </div>
             <div class="flex gap-2 ml-4">
@@ -1626,8 +1448,8 @@
             </button>
 
             <div class="mt-6">
-              <div style="height: 240px; padding: 0; margin: 0 0 1rem 0; position: relative;" class="bg-slate-50 rounded-xl border-2 overflow-hidden">
-                <canvas id="chart-${sec.id}" style="display: block; width: 100% !important; height: 100% !important;"></canvas>
+              <div class="h-72 bg-slate-50 p-4 rounded-xl border-2 mb-4">
+                <canvas id="chart-${sec.id}"></canvas>
               </div>
               <div>
                 <label class="block text-sm font-bold text-slate-700 mb-2">ULASAN</label>
@@ -1977,15 +1799,11 @@
       const ctx = document.getElementById(`chart-${sec.id}`);
       if(!ctx) return;
       
-      // Set canvas to fill container completely
-      ctx.style.height = '100%';
-      ctx.style.width = '100%';
-      
       const m = settings.month;
       const data = sec.data[m] || [];
       
-      // Determine rotation based on number of bars - FIXED LOGIC
-      const shouldRotate = data.length > 5; // Changed from >4 to >5
+      // Determine rotation based on number of bars
+      const shouldRotate = data.length > 4;
       const rotation = shouldRotate ? 90 : 0;
       
       new Chart(ctx.getContext('2d'), {
@@ -2004,14 +1822,6 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          layout: {
-            padding: {
-              left: 0,
-              right: 0,
-              top: 15,
-              bottom: 0
-            }
-          },
           plugins: {
             legend: { display: false },
             datalabels: {
@@ -2027,62 +1837,15 @@
           scales: {
             y: { 
               beginAtZero: true,
-              grid: { 
-                display: false,
-                drawBorder: true
-              },
-              border: {
-                display: true,
-                color: '#000000',
-                width: 2
-              },
-              ticks: { 
-                font: { weight: 'bold', size: 12 },
-                color: '#000000',
-                padding: 5
-              }
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: { font: { weight: 'bold' } }
             },
             x: { 
-              grid: { 
-                display: false,
-                drawBorder: true
-              },
-              border: {
-                display: true,
-                color: '#000000',
-                width: 2
-              },
+              grid: { display: false },
               ticks: { 
-                font: { weight: 'bold', size: 10 },
-                color: '#000000',
-                padding: 5,
-                maxRotation: 0,
-                minRotation: 0,
-                autoSkip: false,
-                // WRAP TEXT - Break long labels into multiple lines
-                callback: function(value, index, ticks) {
-                  const label = this.getLabelForValue(value);
-                  const maxWidth = 15; // Max characters per line
-                  
-                  if (label.length <= maxWidth) return label;
-                  
-                  // Split by spaces and wrap
-                  const words = label.split(' ');
-                  const lines = [];
-                  let currentLine = '';
-                  
-                  words.forEach(word => {
-                    if ((currentLine + word).length <= maxWidth) {
-                      currentLine += (currentLine ? ' ' : '') + word;
-                    } else {
-                      if (currentLine) lines.push(currentLine);
-                      currentLine = word;
-                    }
-                  });
-                  if (currentLine) lines.push(currentLine);
-                  
-                  return lines;
-                }
+                font: { weight: 'bold' },
+                maxRotation: rotation,
+                minRotation: rotation
               }
             }
           }
@@ -2220,14 +1983,7 @@
     }
 
     function saveToArchive() {
-      // Check if archive already exists for this month/year
-      const existingIndex = archive.findIndex(item => 
-        item.month === settings.month && 
-        item.year === settings.year &&
-        item.department === settings.department
-      );
-      
-      const archiveData = {
+      archive.push({
         id: Date.now(),
         month: settings.month,
         year: settings.year,
@@ -2235,36 +1991,9 @@
         orgName: settings.orgName,
         sections: JSON.parse(JSON.stringify(sections)),
         timestamp: new Date().toLocaleString('ms-MY')
-      };
-      
-      if(existingIndex !== -1) {
-        // Replace existing archive
-        const confirmReplace = confirm(
-          `Arkib untuk ${settings.month} ${settings.year} sudah wujud.\n\n` +
-          `Klik OK untuk gantikan arkib lama.\n` +
-          `Klik Cancel untuk simpan sebagai arkib baru.`
-        );
-        
-        if(confirmReplace) {
-          archive[existingIndex] = archiveData;
-          autoSave();
-          alert('✅ Arkib berjaya dikemaskini!');
-        } else {
-          // Save as new with timestamp
-          archiveData.id = Date.now();
-          archive.push(archiveData);
-          autoSave();
-          alert('✅ Arkib baru berjaya disimpan!');
-        }
-      } else {
-        // Save new archive
-        archive.push(archiveData);
-        autoSave();
-        alert('✅ Laporan berjaya disimpan ke arkib!');
-      }
-      
-      // Log activity
-      logActivity(`Saved archive: ${settings.month} ${settings.year}`);
+      });
+      autoSave();
+      alert('✅ Laporan berjaya disimpan ke arkib!');
     }
 
     function renderArchive() {
@@ -2451,46 +2180,28 @@
     }
 
     function exportToExcel() {
-      try {
-        const wb = XLSX.utils.book_new();
+      const wb = XLSX.utils.book_new();
+      
+      sections.forEach((sec, idx) => {
+        const data = [
+          [`${sectionLabels[idx]}. ${sec.title}`],
+          ['Kategori', ...months, 'JUMLAH'],
+        ];
         
-        if(sections.length === 0) {
-          alert('❌ Tiada seksyen untuk di-export!');
-          return;
-        }
-        
-        sections.forEach((sec, idx) {
-          if(sec.hidden) return;
-          
-          const data = [
-            [`${sectionLabels[idx]}. ${sec.title}`],
-            ['Kategori', ...months, 'JUMLAH'],
-          ];
-          
-          // Get first month that has data
-          const firstDataMonth = months.find(m => sec.data[m] && sec.data[m].length > 0) || 'Januari';
-          
-          if(sec.data[firstDataMonth]) {
-            sec.data[firstDataMonth].forEach(r => {
-              const row = [r.kategori];
-              const mVals = months.map(m => getVal(sec.id, m, r.kategori));
-              const total = mVals.reduce((a,b) => a+b, 0);
-              row.push(...mVals, total);
-              data.push(row);
-            });
-          }
-          
-          const ws = XLSX.utils.aoa_to_sheet(data);
-          XLSX.utils.book_append_sheet(wb, ws, sec.title.substring(0, 31));
+        sec.data["Januari"].forEach(r => {
+          const row = [r.kategori];
+          const mVals = months.map(m => getVal(sec.id, m, r.kategori));
+          const total = mVals.reduce((a,b) => a+b, 0);
+          row.push(...mVals, total);
+          data.push(row);
         });
         
-        XLSX.writeFile(wb, `Laporan_${settings.month}_${settings.year}.xlsx`);
-        logActivity(`Exported to Excel: ${settings.month} ${settings.year}`);
-        alert('✅ Excel berjaya di-export!');
-      } catch(error) {
-        console.error('Excel export error:', error);
-        alert('❌ Ralat export Excel: ' + error.message);
-      }
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        XLSX.utils.book_append_sheet(wb, ws, sec.title.substring(0, 31));
+      });
+      
+      XLSX.writeFile(wb, `Laporan_${settings.month}_${settings.year}.xlsx`);
+      alert('✅ Excel berjaya di-export!');
     }
     
     function exportToWord() {
@@ -2643,7 +2354,7 @@
         const isFirstCol = input.closest('td') && input.closest('td').cellIndex === 0;
         const alignment = isFirstCol ? 'left' : 'center';
         
-        textDiv.style.cssText = `word-wrap: break-word; white-space: normal; text-align: ${alignment}; font-weight: 600; font-size: 7.5pt; line-height: 1;`;
+        textDiv.style.cssText = `word-wrap: break-word; white-space: normal; text-align: ${alignment}; font-weight: 600; font-size: 8pt; line-height: 1.3;`;
         
         // Store original input for restoration
         input.dataset.printHidden = 'true';
