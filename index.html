@@ -212,23 +212,25 @@
         white-space: normal !important;
       }
       
-      /* GRAF - Santai size untuk print */
+      /* GRAF - COMPACT print size, NO whitespace */
       canvas { 
-        max-height: 180px !important;
-        max-width: 100% !important;
-        height: 180px !important;
+        max-height: 200px !important;
+        height: 200px !important;
         width: 100% !important;
-        page-break-inside: avoid;
+        page-break-inside: avoid !important;
         display: block !important;
-        margin: 10px 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
       
-      .chart-container,
+      /* Chart container - TIGHT fit */
       div:has(> canvas) {
-        max-height: 480px !important;
-        height: 480px !important;
-        page-break-inside: avoid;
+        max-height: 200px !important;
+        height: 200px !important;
+        page-break-inside: avoid !important;
         padding: 0 !important;
+        margin: 0.5rem 0 !important;
+        overflow: hidden !important;
       }
       
       /* HIDE ULASAN LABEL ONLY - KEEP CONTENT */
@@ -1499,7 +1501,7 @@
             </button>
 
             <div class="mt-6">
-              <div style="height: 280px; padding: 8px; margin: 0 0 1rem 0; position: relative;" class="bg-slate-50 rounded-xl border-2">
+              <div style="height: 320px; padding: 0; margin: 0 0 1rem 0; overflow: visible;" class="bg-slate-50 rounded-xl border-2">
                 <canvas id="chart-${sec.id}" style="display: block; width: 100% !important; height: 100% !important;"></canvas>
               </div>
               <div>
@@ -1850,7 +1852,6 @@
       const ctx = document.getElementById(`chart-${sec.id}`);
       if(!ctx) return;
       
-      // Set canvas to fill container completely
       ctx.style.height = '100%';
       ctx.style.width = '100%';
       
@@ -1875,10 +1876,10 @@
           maintainAspectRatio: false,
           layout: {
             padding: {
-              left: 5,
-              right: 5,
-              top: 20,
-              bottom: 5
+              left: 10,
+              right: 10,
+              top: 50,
+              bottom: 80
             }
           },
           plugins: {
@@ -1892,8 +1893,8 @@
               },
               color: '#1e3a8a',
               padding: {
-                top: 0,
-                bottom: 8
+                top: 10,
+                bottom: 20
               }
             },
             legend: { display: false },
@@ -1901,8 +1902,8 @@
               display: true,
               anchor: 'end',
               align: 'top',
-              offset: 2,
-              font: { weight: 'bold', size: 12 },
+              offset: 3,
+              font: { weight: 'bold', size: 11 },
               color: '#1e40af',
               formatter: (val) => val || 0
             }
@@ -1920,9 +1921,9 @@
                 width: 2
               },
               ticks: { 
-                font: { weight: 'bold', size: 11 },
+                font: { weight: 'bold', size: 10 },
                 color: '#000000',
-                padding: 3
+                padding: 5
               }
             },
             x: { 
@@ -1938,18 +1939,16 @@
               ticks: { 
                 font: { weight: 'bold', size: 8 },
                 color: '#000000',
-                padding: 2,
+                padding: 5,
                 maxRotation: 0,
                 minRotation: 0,
                 autoSkip: false,
-                // WRAP TEXT callback
                 callback: function(value, index, ticks) {
                   const label = this.getLabelForValue(value);
-                  const maxChars = 12;
+                  const maxChars = 11;
                   
                   if (label.length <= maxChars) return label;
                   
-                  // Split into words and wrap
                   const words = label.split(' ');
                   const lines = [];
                   let currentLine = '';
