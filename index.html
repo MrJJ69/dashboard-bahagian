@@ -879,7 +879,11 @@
             },
             x: {
               grid: { display: false },
-              ticks: { font: { weight: 'bold', size: 10 } }
+              ticks: { 
+                font: { weight: 'bold', size: 10 },
+                maxRotation: 0,
+                minRotation: 0
+              }
             }
           }
         }
@@ -919,7 +923,14 @@
             }
           },
           scales: {
-            y: { beginAtZero: true }
+            y: { beginAtZero: true },
+            x: {
+              ticks: {
+                maxRotation: 0,
+                minRotation: 0,
+                font: { size: 10 }
+              }
+            }
           }
         }
       });
@@ -1722,7 +1733,35 @@
             },
             x: { 
               grid: { display: false },
-              ticks: { font: { weight: 'bold' } }
+              ticks: { 
+                font: { weight: 'bold', size: 10 },
+                maxRotation: 0,
+                minRotation: 0,
+                autoSkip: false,
+                callback: function(value, index, ticks) {
+                  const label = this.getLabelForValue(value);
+                  const maxWidth = 15; // max characters per line
+                  if (label.length > maxWidth) {
+                    // Split long text into multiple lines
+                    const words = label.split(' ');
+                    const lines = [];
+                    let currentLine = '';
+                    
+                    words.forEach(word => {
+                      if ((currentLine + ' ' + word).trim().length > maxWidth) {
+                        if (currentLine) lines.push(currentLine.trim());
+                        currentLine = word;
+                      } else {
+                        currentLine = currentLine ? currentLine + ' ' + word : word;
+                      }
+                    });
+                    if (currentLine) lines.push(currentLine.trim());
+                    
+                    return lines;
+                  }
+                  return label;
+                }
+              }
             }
           }
         }
