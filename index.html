@@ -3,1087 +3,1060 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Laporan Perpustakaan · Pengurusan Pengguna & Data Lalu</title>
-  
+  <title>Sistem Laporan Perpustakaan</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- Heroicons & Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * { font-family: 'Calibri', Arial, sans-serif; }
-    html, body { overflow-x: hidden; }
-    .gradient-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .gradient-pink { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-    .gradient-cyan { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-    .gradient-green { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-    
+    html, body { overflow-x: hidden; margin: 0; padding: 0; }
+    .gradient-blue  { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); }
+    .gradient-pink  { background: linear-gradient(135deg,#f093fb 0%,#f5576c 100%); }
+    .gradient-cyan  { background: linear-gradient(135deg,#4facfe 0%,#00f2fe 100%); }
+    .gradient-green { background: linear-gradient(135deg,#43e97b 0%,#38f9d7 100%); }
+
+    /* Login */
+    .login-bg {
+      min-height:100vh; background:linear-gradient(135deg,#1e3a5f 0%,#16213e 50%,#0f3460 100%);
+      display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+    }
+    .login-bg::before {
+      content:''; position:absolute; inset:0;
+      background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .login-card {
+      background:rgba(255,255,255,0.97); border-radius:20px; padding:48px 40px;
+      width:100%; max-width:420px; box-shadow:0 25px 60px rgba(0,0,0,0.4); position:relative; z-index:1;
+    }
+    .login-input {
+      width:100%; padding:14px 16px 14px 44px; border:2px solid #e5e7eb; border-radius:10px;
+      font-size:15px; outline:none; transition:border-color 0.2s; box-sizing:border-box;
+    }
+    .login-input:focus { border-color:#3b82f6; }
+    .login-btn {
+      width:100%; padding:14px; background:linear-gradient(135deg,#1e3a5f,#3b82f6);
+      color:white; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; transition:opacity 0.2s,transform 0.1s;
+    }
+    .login-btn:hover { opacity:0.92; transform:translateY(-1px); }
+    .login-btn:active { transform:translateY(0); }
+    .role-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+    .role-admin  { background:#fef3c7; color:#92400e; }
+    .role-editor { background:#dbeafe; color:#1e40af; }
+    .role-viewer { background:#f3f4f6; color:#374151; }
+
+    /* Print */
     @media print {
-      .no-print { display: none !important; }
-      body { background: white !important; margin: 0; padding: 0; }
-      @page { size: A4; margin: 1.8cm; }
-      
-      .print-section {
-        page-break-inside: avoid;
-        break-inside: avoid;
-        display: block;
-        box-sizing: border-box;
-      }
-      .print-section:not(:first-child) {
-        page-break-before: always;
-      }
-      
-      .print-section .chart-container,
-      .print-section .ulasan-section {
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
-      
-      nav, aside, .sidebar, .user-management-panel { display: none !important; }
-      main { margin-left: 0 !important; padding: 0 !important; max-width: 100% !important; }
-      
-      .print-header { font-size: 12pt !important; font-weight: bold !important; margin-bottom: 0.1cm !important; line-height: 1.2 !important; }
-      .section-title { font-size: 11pt !important; font-weight: bold !important; margin: 0.2cm 0 0.2cm !important; }
-      table { page-break-inside: avoid; font-size: 9pt !important; border-collapse: collapse !important; width: 100% !important; }
-      td, th { border: 1px solid black !important; padding: 0.1cm 0.15cm !important; }
-      .chart-container { page-break-inside: avoid; margin: 0.3cm 0 !important; }
-      .ulasan-section { page-break-inside: avoid; margin-top: 0.3cm !important; }
-      textarea { border: 1px solid black !important; font-size: 9pt !important; padding: 0.2cm !important; min-height: 2cm !important; }
-      * { border-radius: 0 !important; box-shadow: none !important; }
-      
-      /* Ensure charts print with solid colors */
-      .bar { background-color: black !important; }
-      .bar-value, .bar-label { color: black !important; }
+      .no-print { display:none !important; }
+      body { background:white !important; margin:0; padding:0; border:none; }
+      @page { size:A4; margin:1.8cm; }
+      .print-section { page-break-inside:avoid; break-inside:avoid; display:block; box-sizing:border-box; }
+      .print-section:not(:first-child) { page-break-before:always; }
+      nav, aside, .sidebar { display:none !important; }
+      main { margin-left:0 !important; padding:0 !important; max-width:100% !important; border:none; }
+      .print-header { font-size:12pt !important; font-weight:bold !important; margin-bottom:0.1cm !important; line-height:1.2 !important; }
+      .section-title { font-size:11pt !important; font-weight:bold !important; margin:0.2cm 0 !important; }
+      table { page-break-inside:avoid; font-size:9pt !important; border-collapse:collapse !important; width:100% !important; }
+      td, th { border:1px solid black !important; padding:0.1cm 0.15cm !important; }
+      .chart-container { page-break-inside:avoid; margin:0.3cm 0 !important; }
+      .ulasan-section { page-break-inside:avoid; margin-top:0.3cm !important; }
+      textarea { border:1px solid black !important; font-size:9pt !important; padding:0.2cm !important; min-height:2cm !important; }
+      * { border-radius:0 !important; box-shadow:none !important; }
+      .bg-white, .bg-gray-50, .bg-blue-50, [class*="bg-"] { background-color:transparent !important; }
+      .shadow, .shadow-sm, .shadow-lg { box-shadow:none !important; }
+      .border, .border-gray-100, .border-gray-200 { border-color:black !important; }
     }
 
-    /* Chart axis styling */
-    .chart-with-axis {
-      display: flex;
-      align-items: stretch;
-      margin: 1rem 0;
-    }
-    .y-axis {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 40px;
-      margin-right: 8px;
-      font-size: 10px;
-      color: #4b5563;
-      text-align: right;
-      padding-right: 4px;
-      border-right: 1px solid #9ca3af;
-    }
-    .y-axis span {
-      line-height: 1;
-      transform: translateY(50%);
-    }
-    .bars-container {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 2rem;
-      min-height: 200px;
-      border-bottom: 1px solid #9ca3af;
-    }
-    .bar-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 60px;
-    }
-    .bar {
-      width: 100%;
-      background-color: #3b82f6;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-      transition: height 0.2s;
-    }
-    .bar-label {
-      font-size: 10px;
-      font-weight: 500;
-      margin-top: 6px;
-      text-align: center;
-      word-break: break-word;
-      max-width: 60px;
-    }
-    .bar-value {
-      font-size: 10px;
-      font-weight: bold;
-      margin-bottom: 2px;
-    }
+    /* Charts */
+    .chart-with-axis { display:flex; align-items:stretch; margin:1rem 0; }
+    .y-axis { display:flex; flex-direction:column; justify-content:space-between; width:40px; margin-right:8px; font-size:10px; color:#4b5563; text-align:right; padding-right:4px; border-right:1px solid #9ca3af; }
+    .y-axis span { line-height:1; transform:translateY(50%); }
+    .bars-container { flex:1; display:flex; align-items:flex-end; justify-content:center; gap:2rem; min-height:200px; border-bottom:1px solid #9ca3af; }
 
-    /* User management panel */
-    .user-management-panel {
-      background: white;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    /* Heading styles */
+    .dt-heading { background:linear-gradient(135deg,#1e3a5f,#2563eb); }
+    .dt-subheading { background:linear-gradient(135deg,#0e7490,#0891b2); }
+
+    /* Move buttons */
+    .move-btn { width:28px; height:28px; border-radius:6px; border:1px solid #d1d5db; background:white; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#6b7280; transition:all 0.15s; }
+    .move-btn:hover:not(:disabled) { background:#f3f4f6; border-color:#9ca3af; color:#111827; }
+    .move-btn:disabled { opacity:0.3; cursor:not-allowed; }
+
+    .sidebar-nav { overflow-y:auto; max-height:calc(100vh - 180px); }
+
+    /* Modal */
+    .modal-overlay {
+      position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000;
     }
+    .modal-content {
+      background:white; border-radius:1rem; padding:2rem; max-width:400px; width:90%; box-shadow:0 20px 40px rgba(0,0,0,0.2);
+    }
+    .modal-title { font-size:1.5rem; font-weight:bold; margin-bottom:1.5rem; }
+    .modal-option {
+      padding:1rem; border:2px solid #e5e7eb; border-radius:0.75rem; margin-bottom:1rem; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:1rem;
+    }
+    .modal-option:hover { border-color:#3b82f6; background:#eff6ff; }
+    .modal-option i { font-size:1.5rem; color:#3b82f6; }
+    .modal-option span { font-size:1.1rem; font-weight:500; }
   </style>
 </head>
 <body class="bg-gray-50">
-  <div id="root"></div>
+<div id="root"></div>
+<script type="text/babel">
+  const { useState, useMemo, useCallback, useEffect, memo, useRef } = React;
 
-  <script type="text/babel">
-    const { useState, useMemo, useCallback, useEffect } = React;
+  // ══════════════════════════════════════════════
+  // CONSTANTS
+  // ══════════════════════════════════════════════
+  const MONTHS = ["JANUARI","FEBRUARI","MAC","APRIL","MEI","JUN","JULAI","OGOS","SEPTEMBER","OKTOBER","NOVEMBER","DISEMBER"];
 
-    const MONTHS = ["JANUARI", "FEBRUARI", "MAC", "APRIL", "MEI", "JUN", "JULAI", "OGOS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DISEMBER"];
+  const DEFAULT_USERS = [
+    { id:1, username:'admin',   password:'admin123',  role:'admin',  nama:'Administrator' },
+    { id:2, username:'editor1', password:'editor123', role:'editor', nama:'Editor Satu' },
+    { id:3, username:'viewer1', password:'viewer123', role:'viewer', nama:'Viewer Satu' },
+  ];
 
-    const getPrevMonth = (month) => {
-      const idx = MONTHS.indexOf(month);
-      return idx > 0 ? MONTHS[idx - 1] : null;
-    };
+  const TABS_BY_ROLE = {
+    admin:  ['dashboard','data-tahunan','laporan-bulanan'],
+    editor: ['dashboard','laporan-bulanan'],
+    viewer: ['dashboard'],
+  };
+  const TAB_CONFIG = [
+    { key:'dashboard',       label:'Dashboard',      icon:'fa-chart-bar' },
+    { key:'data-tahunan',    label:'Data Tahunan',   icon:'fa-table' },
+    { key:'laporan-bulanan', label:'Laporan Bulanan', icon:'fa-file-alt' },
+  ];
 
-    const calculateKumulatif = (entry, month) => {
-      const monthIdx = MONTHS.indexOf(month);
-      let total = 0;
-      for (let i = 0; i <= monthIdx; i++) {
-        total += entry[MONTHS[i]] || 0;
+  const ROLE_LABEL = { admin:'Admin', editor:'Editor', viewer:'Viewer' };
+  const ROLE_CLASS = { admin:'role-admin', editor:'role-editor', viewer:'role-viewer' };
+
+  const getPrevMonth = (month) => { const i=MONTHS.indexOf(month); return i>0?MONTHS[i-1]:null; };
+  const calculateKumulatif = (entry, month) => {
+    const mi=MONTHS.indexOf(month); let t=0;
+    for(let i=0;i<=mi;i++) t+=entry[MONTHS[i]]||0;
+    return t;
+  };
+
+  // Fungsi untuk menukar angka ke roman (huruf kecil)
+  function toRoman(num) {
+    const roman = {1:'i',2:'ii',3:'iii',4:'iv',5:'v',6:'vi',7:'vii',8:'viii',9:'ix',10:'x',40:'xl',50:'l',90:'xc',100:'c',400:'cd',500:'d',900:'cm',1000:'m'};
+    let str = '';
+    const values = [1000,900,500,400,100,90,50,40,10,9,8,7,6,5,4,3,2,1];
+    for (let v of values) {
+      while (num >= v) {
+        str += roman[v];
+        num -= v;
       }
-      return total;
+    }
+    return str;
+  }
+
+  // ══════════════════════════════════════════════
+  // UNCONTROLLED INPUTS
+  // ══════════════════════════════════════════════
+  const MonthInput = memo(({ entryId, month, value, onCommit }) => {
+    const [local,setLocal]=useState(String(value)); const prev=useRef(value);
+    useEffect(()=>{ if(value!==prev.current){setLocal(String(value));prev.current=value;} },[value]);
+    return (
+      <div>
+        <label className="text-xs font-medium mb-1 block">{month.substring(0,3)}</label>
+        <input type="number" value={local}
+          onChange={e=>setLocal(e.target.value)}
+          onBlur={()=>{ const n=parseFloat(local)||0; prev.current=n; onCommit(entryId,month,n); }}
+          onKeyDown={e=>{ if(e.key==='Enter') e.target.blur(); }}
+          className="w-full px-3 py-2 border rounded text-center text-base" style={{minWidth:'80px'}} />
+      </div>
+    );
+  });
+
+  const TextFieldInput = memo(({ value, onCommit, label, className }) => {
+    const cls=className||"w-full px-4 py-3 border rounded-lg text-base";
+    const [local,setLocal]=useState(value); const prev=useRef(value);
+    useEffect(()=>{ if(value!==prev.current){setLocal(value);prev.current=value;} },[value]);
+    return (
+      <div>
+        {label && <label className="text-sm font-medium mb-1 block">{label}</label>}
+        <input type="text" value={local}
+          onChange={e=>setLocal(e.target.value)}
+          onBlur={()=>{ prev.current=local; onCommit(local); }}
+          onKeyDown={e=>{ if(e.key==='Enter') e.target.blur(); }}
+          className={cls} />
+      </div>
+    );
+  });
+
+  const InlineEditInput = memo(({ value, onCommit, textClass }) => {
+    const [local,setLocal]=useState(value); const prev=useRef(value);
+    useEffect(()=>{ if(value!==prev.current){setLocal(value);prev.current=value;} },[value]);
+    return (
+      <input type="text" value={local}
+        onChange={e=>setLocal(e.target.value)}
+        onBlur={()=>{ if(local!==prev.current){prev.current=local;onCommit(local);} }}
+        onKeyDown={e=>{ if(e.key==='Enter') e.target.blur(); }}
+        className={`bg-transparent border-b border-dashed border-white border-opacity-50 focus:outline-none focus:border-opacity-100 px-1 ${textClass||''}`}
+        style={{minWidth:'200px'}} />
+    );
+  });
+
+  const SectionNameInput = memo(({ value, onCommit }) => {
+    const [local,setLocal]=useState(value); const prev=useRef(value);
+    useEffect(()=>{ if(value!==prev.current){setLocal(value);prev.current=value;} },[value]);
+    return (
+      <input type="text" value={local}
+        onChange={e=>setLocal(e.target.value)}
+        onBlur={()=>{ if(local!==prev.current){prev.current=local;onCommit(local);} }}
+        onKeyDown={e=>{ if(e.key==='Enter') e.target.blur(); }}
+        className="text-xl font-bold text-gray-800 bg-transparent border-b-2 border-dashed border-gray-400 focus:outline-none focus:border-blue-500 px-2 py-1 w-full max-w-lg" />
+    );
+  });
+
+  const UlasanTextarea = memo(({ value, onCommit, readOnly }) => {
+    const [local,setLocal]=useState(value); const prev=useRef(value);
+    useEffect(()=>{ if(value!==prev.current){setLocal(value);prev.current=value;} },[value]);
+    return (
+      <textarea value={local}
+        onChange={e=>setLocal(e.target.value)}
+        onBlur={()=>{ prev.current=local; onCommit(local); }}
+        disabled={readOnly} readOnly={readOnly} rows="3"
+        className={`w-full border border-black p-3 rounded bg-white resize-y ${readOnly?'bg-gray-100':''}`}
+        placeholder={readOnly?'Ulasan hanya boleh dibaca':'Taip ulasan...'} />
+    );
+  });
+
+  // ══════════════════════════════════════════════
+  // ENTRY ROW
+  // ══════════════════════════════════════════════
+  const EntryRow = memo(({ entry, onUpdate, onDelete, onMonthCommit }) => (
+    <div className="mb-6 pb-6 border-b last:border-b-0">
+      <div className="grid md:grid-cols-5 gap-4 mb-4">
+        <div>
+          <label className="text-sm font-medium mb-1 block">Format</label>
+          <select value={entry.format} onChange={e=>onUpdate(entry.id,'format',parseInt(e.target.value))}
+            className="w-full px-4 py-3 border rounded-lg text-base">
+            <option value={1}>Format 1</option>
+            <option value={2}>Format 2</option>
+            <option value={3}>Format 3</option>
+          </select>
+        </div>
+        {entry.format===1 && <TextFieldInput label="Kategori" value={entry.category||''} onCommit={v=>onUpdate(entry.id,'category',v)} />}
+        <div className={entry.format===1?'':'md:col-span-2'}>
+          <TextFieldInput label="Item" value={entry.item||''} onCommit={v=>onUpdate(entry.id,'item',v)} />
+        </div>
+        <div className="flex items-end md:col-span-2">
+          <button onClick={()=>onDelete(entry.id)} className="w-full px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium text-base">
+            <i className="fas fa-trash mr-2"></i>Padam
+          </button>
+        </div>
+      </div>
+      {entry.format===3 ? (
+        <div className="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg">
+          {[1,2,3].map(n=>(
+            <TextFieldInput key={n} label={entry[`colHeader${n}`]||`Lajur ${n}`}
+              value={String(entry[`col${n}`]||'')} onCommit={v=>onUpdate(entry.id,`col${n}`,v)}
+              className="w-full px-3 py-2 border rounded text-center" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg">
+          {MONTHS.map(month=>(
+            <MonthInput key={month} entryId={entry.id} month={month} value={entry[month]||0} onCommit={onMonthCommit} />
+          ))}
+        </div>
+      )}
+    </div>
+  ));
+
+  // ══════════════════════════════════════════════
+  // LOGIN PAGE
+  // ══════════════════════════════════════════════
+  const LoginPage = memo(({ users, onLogin }) => {
+    const [username,setUsername]=useState('');
+    const [password,setPassword]=useState('');
+    const [showPw,setShowPw]=useState(false);
+    const [error,setError]=useState('');
+    const [loading,setLoading]=useState(false);
+    const handleLogin = () => {
+      if(!username||!password){setError('Sila masukkan nama pengguna dan kata laluan.');return;}
+      setLoading(true);
+      setTimeout(()=>{
+        const user=users.find(u=>u.username===username&&u.password===password);
+        if(user){onLogin(user);}else{setError('Nama pengguna atau kata laluan tidak sah.');setLoading(false);}
+      },500);
     };
-
-    // --- User Management ---
-    const defaultUsers = [
-      { username: 'admin', password: 'admin', role: 'admin' },
-      { username: 'editor', password: 'editor', role: 'editor' },
-      { username: 'view', password: 'view', role: 'view' }
-    ];
-
-    // Simple password check
-    const checkPassword = (username, password, users) => {
-      const user = users.find(u => u.username === username);
-      if (!user) return false;
-      return user.password === password;
-    };
-
-    function App() {
-      const [users, setUsers] = useState(defaultUsers);
-      const [currentUser, setCurrentUser] = useState({ username: 'admin', role: 'admin' }); // auto-login admin for demo
-      const [showLogin, setShowLogin] = useState(false);
-      const [loginUsername, setLoginUsername] = useState('');
-      const [loginPassword, setLoginPassword] = useState('');
-      const [loginError, setLoginError] = useState('');
-
-      // For admin: user management
-      const [showUserManagement, setShowUserManagement] = useState(false);
-      const [newUsername, setNewUsername] = useState('');
-      const [newPassword, setNewPassword] = useState('');
-      const [newRole, setNewRole] = useState('view');
-
-      const [currentView, setCurrentView] = useState('dashboard');
-      const [sidebarOpen, setSidebarOpen] = useState(true);
-
-      // Data untuk tahun lepas (2025, 2024) – cumulative values per section
-      const [historicalData, setHistoricalData] = useState({
-        '2025': {
-          'A. PERKHIDMATAN KOLEKSI': 8500,
-          'B. PINJAMAN ANTARA PERPUSTAKAAN': 45,
-          'C. PUSAT WILAYAH': 1200
-        },
-        '2024': {
-          'A. PERKHIDMATAN KOLEKSI': 7200,
-          'B. PINJAMAN ANTARA PERPUSTAKAAN': 38,
-          'C. PUSAT WILAYAH': 950
-        }
-      });
-
-      const [dataEntries, setDataEntries] = useState([
-        { id: 1, section: 'A. PERKHIDMATAN KOLEKSI', format: 1, category: 'PINJAMAN', item: 'Rak Terbuka',
-          JANUARI: 532, FEBRUARI: 450, MAC: 480, APRIL: 510, MEI: 490, JUN: 520, JULAI: 540, OGOS: 500, SEPTEMBER: 530, OKTOBER: 550, NOVEMBER: 560, DISEMBER: 570 },
-        { id: 2, section: 'A. PERKHIDMATAN KOLEKSI', format: 1, category: 'PINJAMAN', item: 'Course Reserve',
-          JANUARI: 6, FEBRUARI: 8, MAC: 7, APRIL: 9, MEI: 8, JUN: 10, JULAI: 9, OGOS: 8, SEPTEMBER: 7, OKTOBER: 9, NOVEMBER: 8, DISEMBER: 7 },
-        { id: 8, section: 'A. PERKHIDMATAN KOLEKSI', format: 1, category: 'PINJAMAN', item: 'Rak Padat',
-          JANUARI: 120, FEBRUARI: 115, MAC: 130, APRIL: 125, MEI: 140, JUN: 135, JULAI: 145, OGOS: 140, SEPTEMBER: 150, OKTOBER: 155, NOVEMBER: 160, DISEMBER: 165 },
-        { id: 3, section: 'A. PERKHIDMATAN KOLEKSI', format: 1, category: 'PEMULANGAN', item: 'Rak Terbuka',
-          JANUARI: 1859, FEBRUARI: 1650, MAC: 1700, APRIL: 1750, MEI: 1680, JUN: 1720, JULAI: 1800, OGOS: 1760, SEPTEMBER: 1790, OKTOBER: 1820, NOVEMBER: 1850, DISEMBER: 1880 },
-        { id: 9, section: 'A. PERKHIDMATAN KOLEKSI', format: 1, category: 'PEMULANGAN', item: 'Course Reserve',
-          JANUARI: 45, FEBRUARI: 42, MAC: 38, APRIL: 50, MEI: 47, JUN: 52, JULAI: 49, OGOS: 55, SEPTEMBER: 53, OKTOBER: 58, NOVEMBER: 60, DISEMBER: 62 },
-        { id: 10, section: 'A. PERKHIDMATAN KOLEKSI', format: 1, category: 'PEMULANGAN', item: 'Rak Padat',
-          JANUARI: 210, FEBRUARI: 200, MAC: 215, APRIL: 220, MEI: 230, JUN: 225, JULAI: 240, OGOS: 235, SEPTEMBER: 250, OKTOBER: 245, NOVEMBER: 260, DISEMBER: 255 },
-        { id: 4, section: 'A. PERKHIDMATAN KOLEKSI', format: 1, category: 'TEMPATAN', item: 'Rak Terbuka',
-          JANUARI: 720, FEBRUARI: 700, MAC: 750, APRIL: 730, MEI: 780, JUN: 760, JULAI: 800, OGOS: 790, SEPTEMBER: 820, OKTOBER: 810, NOVEMBER: 850, DISEMBER: 840 },
-        { id: 5, section: 'B. PINJAMAN ANTARA PERPUSTAKAAN', format: 2, category: '', item: 'Berjaya',
-          JANUARI: 4, FEBRUARI: 5, MAC: 6, APRIL: 5, MEI: 7, JUN: 6, JULAI: 8, OGOS: 7, SEPTEMBER: 6, OKTOBER: 5, NOVEMBER: 7, DISEMBER: 6 },
-        { id: 6, section: 'B. PINJAMAN ANTARA PERPUSTAKAAN', format: 2, category: '', item: 'Gagal',
-          JANUARI: 2, FEBRUARI: 1, MAC: 2, APRIL: 3, MEI: 2, JUN: 3, JULAI: 2, OGOS: 3, SEPTEMBER: 2, OKTOBER: 3, NOVEMBER: 2, DISEMBER: 3 },
-        { id: 7, section: 'C. PUSAT WILAYAH', format: 3, category: '', item: 'Arau', 
-          colHeader1: 'BUKU', colHeader2: 'STAF', colHeader3: 'TARIKH', col1: 1520, col2: 5, col3: '12-Jan-2025' }
-      ]);
-
-      const [sectionComments, setSectionComments] = useState({});
-      const updateSectionComment = (section, text) => {
-        setSectionComments(prev => ({ ...prev, [section]: text }));
-      };
-
-      // Fungsi untuk menukar nama seksyen
-      const renameSection = (oldName, newName) => {
-        if (!newName.trim() || oldName === newName) return;
-        setDataEntries(prev => prev.map(e => 
-          e.section === oldName ? { ...e, section: newName } : e
-        ));
-        setSectionComments(prev => {
-          const newComments = { ...prev };
-          if (prev[oldName] !== undefined) {
-            newComments[newName] = prev[oldName];
-            delete newComments[oldName];
-          }
-          return newComments;
-        });
-        // Also update historical keys
-        setHistoricalData(prev => {
-          const newHist = { ...prev };
-          ['2025', '2024'].forEach(year => {
-            if (prev[year] && prev[year][oldName] !== undefined) {
-              newHist[year][newName] = prev[year][oldName];
-              delete newHist[year][oldName];
-            }
-          });
-          return newHist;
-        });
-      };
-
-      const addNewSection = useCallback(() => {
-        const newId = Date.now();
-        const newEntry = {
-          id: newId, section: 'BAHAGIAN BARU', format: 1, category: 'KATEGORI', item: 'Item',
-          ...Object.fromEntries(MONTHS.map(m => [m, 0]))
-        };
-        setDataEntries(prev => [...prev, newEntry]);
-      }, []);
-
-      const addRowToSection = useCallback((sectionName, format) => {
-        const sectionEntries = dataEntries.filter(e => e.section === sectionName && e.format === format);
-        const template = sectionEntries.length > 0 ? sectionEntries[0] : null;
-        const newEntry = {
-          id: Date.now(), section: sectionName, format: format,
-          category: format === 1 ? (template?.category || 'KATEGORI') : '',
-          item: 'Item Baru'
-        };
-        if (format === 3) {
-          newEntry.colHeader1 = template?.colHeader1 || 'COL1';
-          newEntry.colHeader2 = template?.colHeader2 || 'COL2';
-          newEntry.colHeader3 = template?.colHeader3 || 'COL3';
-          newEntry.col1 = 0; newEntry.col2 = 0; newEntry.col3 = '';
-        } else {
-          MONTHS.forEach(m => newEntry[m] = 0);
-        }
-        setDataEntries(prev => [...prev, newEntry]);
-      }, [dataEntries]);
-
-      const deleteEntry = useCallback((id) => {
-        if (window.confirm('Padam entri ini?')) {
-          setDataEntries(prev => prev.filter(e => e.id !== id));
-        }
-      }, []);
-
-      const updateEntry = useCallback((id, field, value) => {
-        setDataEntries(prev => prev.map(e => e.id === id ? { ...e, [field]: value } : e));
-      }, []);
-
-      const updateMonthValue = useCallback((id, month, value) => {
-        setDataEntries(prev => prev.map(e =>
-          e.id === id ? { ...e, [month]: parseFloat(value) || 0 } : e
-        ));
-      }, []);
-
-      const updateFormat3Headers = useCallback((sectionName, headerNum, value) => {
-        const field = `colHeader${headerNum}`;
-        setDataEntries(prev => prev.map(e =>
-          (e.section === sectionName && e.format === 3) ? { ...e, [field]: value } : e
-        ));
-      }, []);
-
-      // Update historical cumulative for a section
-      const updateHistorical = (year, section, value) => {
-        setHistoricalData(prev => ({
-          ...prev,
-          [year]: {
-            ...prev[year],
-            [section]: parseFloat(value) || 0
-          }
-        }));
-      };
-
-      // KPI based on current year data + historical for comparison
-      const currentYearTotals = useMemo(() => {
-        const totals = {};
-        dataEntries.forEach(entry => {
-          if (entry.format !== 3) {
-            const total = MONTHS.reduce((s, m) => s + (entry[m] || 0), 0);
-            totals[entry.section] = (totals[entry.section] || 0) + total;
-          } else {
-            const total = (parseInt(entry.col1)||0) + (parseInt(entry.col2)||0);
-            totals[entry.section] = (totals[entry.section] || 0) + total;
-          }
-        });
-        return totals;
-      }, [dataEntries]);
-
-      const total2026 = Object.values(currentYearTotals).reduce((s, v) => s + v, 0);
-      const total2025 = Object.values(historicalData['2025']).reduce((s, v) => s + v, 0);
-      const total2024 = Object.values(historicalData['2024']).reduce((s, v) => s + v, 0);
-
-      const percentage2025 = total2025 > 0 ? ((total2026 - total2025) / total2025 * 100).toFixed(1) : 0;
-      const percentage2024 = total2024 > 0 ? ((total2026 - total2024) / total2024 * 100).toFixed(1) : 0;
-
-      // Tabs yang dibenarkan berdasarkan role
-      const allowedTabs = useMemo(() => {
-        if (currentUser.role === 'view') return ['dashboard'];
-        if (currentUser.role === 'editor') return ['dashboard', 'laporan-bulanan'];
-        return ['dashboard', 'data-tahunan', 'laporan-bulanan']; // admin
-      }, [currentUser]);
-
-      useEffect(() => {
-        if (!allowedTabs.includes(currentView)) {
-          setCurrentView(allowedTabs[0]);
-        }
-      }, [currentUser, currentView, allowedTabs]);
-
-      // Handle login
-      const handleLogin = () => {
-        const user = users.find(u => u.username === loginUsername);
-        if (user && user.password === loginPassword) {
-          setCurrentUser({ username: user.username, role: user.role });
-          setShowLogin(false);
-          setLoginError('');
-          setLoginUsername('');
-          setLoginPassword('');
-        } else {
-          setLoginError('Nama pengguna atau kata laluan salah');
-        }
-      };
-
-      const handleLogout = () => {
-        setCurrentUser(null);
-        setShowLogin(true);
-      };
-
-      // Admin: add user
-      const addUser = () => {
-        if (!newUsername || !newPassword) return;
-        setUsers([...users, { username: newUsername, password: newPassword, role: newRole }]);
-        setNewUsername('');
-        setNewPassword('');
-      };
-
-      // Admin: remove user
-      const removeUser = (username) => {
-        if (username === 'admin') {
-          alert('Tidak boleh padam admin utama');
-          return;
-        }
-        setUsers(users.filter(u => u.username !== username));
-      };
-
-      const organizedSections = useMemo(() => {
-        const groups = {};
-        dataEntries.forEach(entry => {
-          if (!groups[entry.section]) groups[entry.section] = { format: entry.format, entries: [] };
-          groups[entry.section].entries.push(entry);
-        });
-        return groups;
-      }, [dataEntries]);
-
-      // Login screen
-      if (!currentUser) {
-        return (
-          <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-xl shadow-lg w-96">
-              <h2 className="text-2xl font-bold mb-6 text-center">Log Masuk</h2>
-              {loginError && <p className="text-red-500 text-sm mb-3">{loginError}</p>}
-              <input type="text" placeholder="Nama Pengguna" value={loginUsername}
-                onChange={(e) => setLoginUsername(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg mb-4" />
-              <input type="password" placeholder="Kata Laluan" value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg mb-6" />
-              <button onClick={handleLogin}
-                className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">
-                Log Masuk
-              </button>
+    return (
+      <div className="login-bg">
+        <div className="login-card">
+          <div style={{textAlign:'center',marginBottom:'28px'}}>
+            <div style={{width:'72px',height:'72px',borderRadius:'18px',background:'linear-gradient(135deg,#1e3a5f,#3b82f6)',display:'inline-flex',alignItems:'center',justifyContent:'center',marginBottom:'16px',boxShadow:'0 8px 24px rgba(59,130,246,0.35)'}}>
+              <i className="fas fa-book-open" style={{fontSize:'32px',color:'white'}}></i>
             </div>
+            <h1 style={{fontSize:'22px',fontWeight:'800',color:'#1e3a5f',marginBottom:'4px',letterSpacing:'-0.5px'}}>Sistem Laporan Perpustakaan</h1>
+            <p style={{fontSize:'13px',color:'#6b7280'}}>Sila log masuk untuk meneruskan</p>
           </div>
-        );
-      }
-
-      const Sidebar = () => (
-        <div className={`fixed left-0 top-0 h-full bg-white shadow-xl transition-all z-50 sidebar ${sidebarOpen ? 'w-64' : 'w-20'}`}>
-          <div className="p-6 border-b flex justify-between items-center">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            {sidebarOpen && <span className="font-semibold text-gray-700">Menu</span>}
-          </div>
-          {sidebarOpen && (
-            <div className="px-4 py-2 border-b">
-              <p className="text-sm text-gray-600">Pengguna: <span className="font-semibold">{currentUser.username}</span> ({currentUser.role})</p>
-              {currentUser.role === 'admin' && (
-                <button onClick={() => setShowUserManagement(!showUserManagement)} 
-                  className="text-xs text-blue-600 mt-1 flex items-center gap-1">
-                  <i className="fas fa-users-cog"></i> Urus Pengguna
-                </button>
-              )}
-              <button onClick={handleLogout} className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                <i className="fas fa-sign-out-alt"></i> Log Keluar
-              </button>
+          {error && (
+            <div style={{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:'8px',padding:'10px 14px',marginBottom:'20px',display:'flex',alignItems:'center',gap:'8px'}}>
+              <i className="fas fa-exclamation-circle" style={{color:'#ef4444',fontSize:'14px'}}></i>
+              <span style={{fontSize:'13px',color:'#b91c1c'}}>{error}</span>
             </div>
           )}
-          <nav className="p-4 space-y-2">
-            {[
-              { key: 'dashboard', label: 'Dashboard', icon: '📊' },
-              { key: 'data-tahunan', label: 'Data Tahunan', icon: '📝' },
-              { key: 'laporan-bulanan', label: 'Laporan Bulanan', icon: '📄' }
-            ].filter(item => allowedTabs.includes(item.key)).map(item => (
-              <button key={item.key} onClick={() => setCurrentView(item.key)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                  currentView === item.key ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
-                }`}>
-                <span>{item.icon}</span>
-                {sidebarOpen && <span className="font-medium">{item.label}</span>}
+          <div style={{marginBottom:'16px'}}>
+            <label style={{fontSize:'13px',fontWeight:'600',color:'#374151',display:'block',marginBottom:'6px'}}>Nama Pengguna</label>
+            <div style={{position:'relative'}}>
+              <i className="fas fa-user" style={{position:'absolute',left:'14px',top:'50%',transform:'translateY(-50%)',color:'#9ca3af',fontSize:'14px'}}></i>
+              <input type="text" value={username} onChange={e=>{setUsername(e.target.value);setError('');}}
+                onKeyDown={e=>{if(e.key==='Enter')handleLogin();}} placeholder="Masukkan nama pengguna" className="login-input" />
+            </div>
+          </div>
+          <div style={{marginBottom:'24px'}}>
+            <label style={{fontSize:'13px',fontWeight:'600',color:'#374151',display:'block',marginBottom:'6px'}}>Kata Laluan</label>
+            <div style={{position:'relative'}}>
+              <i className="fas fa-lock" style={{position:'absolute',left:'14px',top:'50%',transform:'translateY(-50%)',color:'#9ca3af',fontSize:'14px'}}></i>
+              <input type={showPw?'text':'password'} value={password} onChange={e=>{setPassword(e.target.value);setError('');}}
+                onKeyDown={e=>{if(e.key==='Enter')handleLogin();}} placeholder="Masukkan kata laluan"
+                className="login-input" style={{paddingRight:'44px'}} />
+              <button onClick={()=>setShowPw(v=>!v)} style={{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'#9ca3af',padding:'4px'}}>
+                <i className={`fas ${showPw?'fa-eye-slash':'fa-eye'}`} style={{fontSize:'14px'}}></i>
               </button>
+            </div>
+          </div>
+          <button className="login-btn" onClick={handleLogin} disabled={loading}>
+            {loading?<><i className="fas fa-spinner fa-spin mr-2"></i>Mengesahkan...</>:<><i className="fas fa-sign-in-alt mr-2"></i>Log Masuk</>}
+          </button>
+        </div>
+      </div>
+    );
+  });
+
+  // ══════════════════════════════════════════════
+  // URUS PENGGUNA
+  // ══════════════════════════════════════════════
+  const UrusPenggunaView = memo(({ users, setUsers, currentUser }) => {
+    const [form,setForm]=useState({username:'',password:'',role:'editor',nama:''});
+    const [formErr,setFormErr]=useState('');
+    const [showPw,setShowPw]=useState(false);
+    const handleAdd = () => {
+      if(!form.username.trim()){setFormErr('Nama pengguna diperlukan.');return;}
+      if(!form.password.trim()){setFormErr('Kata laluan diperlukan.');return;}
+      if(!form.nama.trim()){setFormErr('Nama penuh diperlukan.');return;}
+      if(users.find(u=>u.username===form.username.trim())){setFormErr('Nama pengguna sudah wujud.');return;}
+      setUsers(prev=>[...prev,{id:Date.now(),username:form.username.trim(),password:form.password.trim(),role:form.role,nama:form.nama.trim()}]);
+      setForm({username:'',password:'',role:'editor',nama:''});setFormErr('');
+    };
+    const handleDelete = (id) => {
+      const target=users.find(u=>u.id===id);
+      if(target.id===currentUser.id){alert('Anda tidak boleh padam akaun sendiri.');return;}
+      if(users.filter(u=>u.role==='admin'&&u.id!==id).length===0){alert('Mesti ada sekurang-kurangnya satu Admin.');return;}
+      if(window.confirm(`Padam pengguna "${target.username}"?`)) setUsers(prev=>prev.filter(u=>u.id!==id));
+    };
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">Urus Pengguna</h1>
+          <p className="text-gray-500 text-sm">Tambah, padam dan urus akaun pengguna sistem.</p>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><i className="fas fa-user-plus text-blue-500"></i> Tambah Pengguna Baru</h2>
+          {formErr && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm flex items-center gap-2"><i className="fas fa-exclamation-circle"></i>{formErr}</div>}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div><label className="text-sm font-semibold mb-1 block">Nama Penuh</label><input type="text" value={form.nama} onChange={e=>{setForm(f=>({...f,nama:e.target.value}));setFormErr('');}} placeholder="Nama penuh" className="w-full px-3 py-2 border rounded-lg text-sm" /></div>
+            <div><label className="text-sm font-semibold mb-1 block">Nama Pengguna</label><input type="text" value={form.username} onChange={e=>{setForm(f=>({...f,username:e.target.value}));setFormErr('');}} placeholder="username" className="w-full px-3 py-2 border rounded-lg text-sm" /></div>
+            <div><label className="text-sm font-semibold mb-1 block">Kata Laluan</label>
+              <div className="relative"><input type={showPw?'text':'password'} value={form.password} onChange={e=>{setForm(f=>({...f,password:e.target.value}));setFormErr('');}} placeholder="kata laluan" className="w-full px-3 py-2 pr-9 border rounded-lg text-sm" />
+              <button onClick={()=>setShowPw(v=>!v)} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"><i className={`fas ${showPw?'fa-eye-slash':'fa-eye'} text-xs`}></i></button></div>
+            </div>
+            <div><label className="text-sm font-semibold mb-1 block">Peranan</label>
+              <select value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))} className="w-full px-3 py-2 border rounded-lg text-sm">
+                <option value="admin">Admin</option><option value="editor">Editor</option><option value="viewer">Viewer</option>
+              </select>
+            </div>
+          </div>
+          <button onClick={handleAdd} className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm flex items-center gap-2">
+            <i className="fas fa-plus"></i> Tambah Pengguna
+          </button>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><i className="fas fa-users text-green-500"></i> Senarai Pengguna ({users.length})</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead><tr className="border-b-2 border-gray-200">
+                <th className="text-left py-3 px-4 text-sm font-bold text-gray-600">Nama Penuh</th>
+                <th className="text-left py-3 px-4 text-sm font-bold text-gray-600">Nama Pengguna</th>
+                <th className="text-center py-3 px-4 text-sm font-bold text-gray-600">Peranan</th>
+                <th className="text-center py-3 px-4 text-sm font-bold text-gray-600">Tindakan</th>
+              </tr></thead>
+              <tbody>{users.map(u=>(
+                <tr key={u.id} className={`border-b border-gray-100 hover:bg-gray-50 ${u.id===currentUser.id?'bg-blue-50':''}`}>
+                  <td className="py-3 px-4 text-sm font-medium">{u.nama}{u.id===currentUser.id&&<span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">Saya</span>}</td>
+                  <td className="py-3 px-4 text-sm text-gray-500 font-mono">{u.username}</td>
+                  <td className="py-3 px-4 text-center"><span className={`role-badge ${ROLE_CLASS[u.role]}`}><i className={`fas ${u.role==='admin'?'fa-crown':u.role==='editor'?'fa-pen':'fa-eye'} text-xs`}></i>{ROLE_LABEL[u.role]}</span></td>
+                  <td className="py-3 px-4 text-center">{u.id!==currentUser.id?(<button onClick={()=>handleDelete(u.id)} className="px-3 py-1.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg text-xs font-semibold"><i className="fas fa-trash mr-1"></i>Padam</button>):(<span className="text-xs text-gray-400">—</span>)}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><i className="fas fa-shield-alt text-purple-500"></i> Panduan Hak Akses</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[{role:'admin',icon:'fa-crown',color:'#92400e',bg:'#fef3c7',border:'#fde68a',desc:'Akses penuh termasuk input data, laporan bulanan, dan pengurusan pengguna.'},
+              {role:'editor',icon:'fa-pen',color:'#1e40af',bg:'#dbeafe',border:'#bfdbfe',desc:'Boleh akses Dashboard dan Laporan Bulanan. Boleh menulis ulasan.'},
+              {role:'viewer',icon:'fa-eye',color:'#374151',bg:'#f3f4f6',border:'#e5e7eb',desc:'Hanya boleh melihat Dashboard sahaja.'}
+            ].map(({role,icon,color,bg,border,desc})=>(
+              <div key={role} style={{background:bg,border:`1px solid ${border}`,borderRadius:'12px',padding:'16px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}}><i className={`fas ${icon}`} style={{color,fontSize:'15px'}}></i><span style={{fontWeight:'700',color,fontSize:'14px'}}>{ROLE_LABEL[role]}</span></div>
+                <p style={{fontSize:'12px',color:'#4b5563',lineHeight:'1.5',marginBottom:'8px'}}>{desc}</p>
+                <div style={{display:'flex',flexWrap:'wrap',gap:'4px'}}>
+                  {TABS_BY_ROLE[role].map(tab=>{const tc=TAB_CONFIG.find(t=>t.key===tab);return tc?<span key={tab} style={{fontSize:'10px',background:'rgba(0,0,0,0.08)',color,padding:'2px 8px',borderRadius:'10px',fontWeight:'600'}}>{tc.label}</span>:null;})}
+                </div>
+              </div>
             ))}
-          </nav>
-        </div>
-      );
-
-      const KPICard = ({ title, value, previous, percentage, gradient, icon, year }) => (
-        <div className={`rounded-2xl shadow-lg p-6 text-white ${gradient}`}>
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <p className="text-sm opacity-90 font-medium mb-1">{title}</p>
-              <h3 className="text-3xl font-bold">{value.toLocaleString()}</h3>
-            </div>
-            <div className="bg-white bg-opacity-20 p-3 rounded-xl">{icon}</div>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${
-              percentage >= 0 ? 'bg-green-500 bg-opacity-30' : 'bg-red-500 bg-opacity-30'
-            }`}>
-              {percentage >= 0 ? '▲' : '▼'}
-              <span className="font-semibold">{Math.abs(percentage)}%</span>
-            </div>
-            <span className="opacity-75">dari {year} ({previous.toLocaleString()})</span>
           </div>
         </div>
-      );
+      </div>
+    );
+  });
 
-      const DashboardView = () => {
-        return (
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-              <h1 className="text-2xl font-bold text-gray-800 mb-2">Dashboard Statistik</h1>
-              <p className="text-gray-600">KPI BERDASARKAN BAHAGIAN · KUMULATIF 2026</p>
-            </div>
+  // ══════════════════════════════════════════════
+  // KPI CARD
+  // ══════════════════════════════════════════════
+  const KPICard = memo(({ title, value, previous, percentage, gradient, icon }) => (
+    <div className={`rounded-2xl shadow-lg p-6 text-white ${gradient}`}>
+      <div className="flex items-start justify-between mb-4">
+        <div><p className="text-sm opacity-90 font-medium mb-1">{title}</p><h3 className="text-3xl font-bold">{value.toLocaleString()}</h3></div>
+        <div className="bg-white bg-opacity-20 p-3 rounded-xl">{icon}</div>
+      </div>
+      <div className="flex items-center gap-2 text-sm">
+        <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${percentage>=0?'bg-green-500 bg-opacity-30':'bg-red-500 bg-opacity-30'}`}>
+          {percentage>=0?'▲':'▼'}<span className="font-semibold">{Math.abs(percentage)}%</span>
+        </div>
+        <span className="opacity-75">dari 2025 ({previous.toLocaleString()})</span>
+      </div>
+    </div>
+  ));
 
-            {/* Historical cumulative data editor (admin only) */}
-            {currentUser.role === 'admin' && (
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                <h2 className="text-lg font-bold text-gray-800 mb-4">Data Kumulatif Tahun Lalu</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {['2025', '2024'].map(year => (
-                    <div key={year} className="border rounded-lg p-4">
-                      <h3 className="font-semibold mb-3">Tahun {year}</h3>
-                      {Object.keys(organizedSections).map(section => (
-                        <div key={section} className="flex items-center gap-2 mb-2">
-                          <span className="text-sm w-1/2">{section}:</span>
-                          <input type="number" value={historicalData[year][section] || 0}
-                            onChange={(e) => updateHistorical(year, section, e.target.value)}
-                            className="w-1/2 px-2 py-1 border rounded text-sm" />
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <KPICard title="Jumlah Transaksi 2026" value={total2026} previous={total2025}
-                percentage={parseFloat(percentage2025)} gradient="gradient-blue" year="2025"
-                icon={<svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" /></svg>}
-              />
-              <KPICard title="A. Perkhidmatan Koleksi" value={currentYearTotals['A. PERKHIDMATAN KOLEKSI'] || 0} 
-                previous={historicalData['2025']['A. PERKHIDMATAN KOLEKSI'] || 0}
-                percentage={((currentYearTotals['A. PERKHIDMATAN KOLEKSI'] - (historicalData['2025']['A. PERKHIDMATAN KOLEKSI'] || 0)) / (historicalData['2025']['A. PERKHIDMATAN KOLEKSI'] || 1) * 100).toFixed(1)}
-                gradient="gradient-pink" year="2025"
-                icon={<svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" /></svg>}
-              />
-              <KPICard title="B. Pinjaman Antara" value={currentYearTotals['B. PINJAMAN ANTARA PERPUSTAKAAN'] || 0}
-                previous={historicalData['2025']['B. PINJAMAN ANTARA PERPUSTAKAAN'] || 0}
-                percentage={((currentYearTotals['B. PINJAMAN ANTARA PERPUSTAKAAN'] - (historicalData['2025']['B. PINJAMAN ANTARA PERPUSTAKAAN'] || 0)) / (historicalData['2025']['B. PINJAMAN ANTARA PERPUSTAKAAN'] || 1) * 100).toFixed(1)}
-                gradient="gradient-cyan" year="2025"
-                icon={<svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" /></svg>}
-              />
-              <KPICard title="C. Pusat Wilayah" value={currentYearTotals['C. PUSAT WILAYAH'] || 0}
-                previous={historicalData['2025']['C. PUSAT WILAYAH'] || 0}
-                percentage={((currentYearTotals['C. PUSAT WILAYAH'] - (historicalData['2025']['C. PUSAT WILAYAH'] || 0)) / (historicalData['2025']['C. PUSAT WILAYAH'] || 1) * 100).toFixed(1)}
-                gradient="gradient-green" year="2025"
-                icon={<svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" /></svg>}
-              />
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-800 mb-6">Ringkasan mengikut Bahagian (2026)</h2>
-              <div className="space-y-4">
-                {Object.entries(currentYearTotals).map(([section, total]) => {
-                  const prev = historicalData['2025'][section] || 0;
-                  const max = Math.max(total, prev, 1);
-                  return (
-                    <div key={section}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium">{section}</span>
-                        <span className="text-blue-600">{total.toLocaleString()} (2026) · {prev.toLocaleString()} (2025)</span>
-                      </div>
-                      <div className="relative h-8 bg-gray-100 rounded overflow-hidden">
-                        <div className="absolute left-0 top-0 h-full bg-blue-500" style={{ width: `${(total/max)*100}%` }} />
-                        <div className="absolute left-0 bottom-0 h-4 bg-gray-400" style={{ width: `${(prev/max)*100}%` }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        );
-      };
-
-      const DataTahunanView = () => (
-        <div className="space-y-6">
-          {showUserManagement && currentUser.role === 'admin' && (
-            <div className="user-management-panel">
-              <h2 className="text-xl font-bold mb-4">Pengurusan Pengguna</h2>
-              <div className="mb-6">
-                <h3 className="font-semibold mb-2">Tambah Pengguna Baru</h3>
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <label className="text-xs">Nama</label>
-                    <input type="text" value={newUsername} onChange={(e) => setNewUsername(e.target.value)}
-                      className="w-full px-3 py-2 border rounded" />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-xs">Kata Laluan</label>
-                    <input type="text" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full px-3 py-2 border rounded" />
-                  </div>
-                  <div className="w-32">
-                    <label className="text-xs">Peranan</label>
-                    <select value={newRole} onChange={(e) => setNewRole(e.target.value)}
-                      className="w-full px-3 py-2 border rounded">
-                      <option value="view">View</option>
-                      <option value="editor">Editor</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </div>
-                  <button onClick={addUser} className="bg-green-500 text-white px-4 py-2 rounded">Tambah</button>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Senarai Pengguna</h3>
-                <table className="w-full border">
-                  <thead className="bg-gray-100">
-                    <tr><th className="p-2 text-left">Nama</th><th className="p-2 text-left">Peranan</th><th className="p-2">Tindakan</th></tr>
-                  </thead>
-                  <tbody>
-                    {users.map(u => (
-                      <tr key={u.username} className="border-t">
-                        <td className="p-2">{u.username}</td>
-                        <td className="p-2">{u.role}</td>
-                        <td className="p-2 text-center">
-                          <button onClick={() => removeUser(u.username)} className="text-red-600 text-sm">
-                            <i className="fas fa-trash"></i> Padam
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          <div className="bg-white rounded-2xl shadow-sm p-6 flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold mb-2">Data Tahunan - Input</h1>
-              <p className="text-gray-600">Tambah / ubah suai data untuk semua bahagian</p>
-            </div>
-            <button onClick={addNewSection} className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:shadow-lg font-semibold">
-              + Bahagian Baru
+  // ══════════════════════════════════════════════
+  // SIDEBAR (dengan ikon setting)
+  // ══════════════════════════════════════════════
+  const Sidebar = memo(({ sidebarOpen, setSidebarOpen, currentUser, currentView, setCurrentView, onLogout }) => {
+    const tabs=TABS_BY_ROLE[currentUser.role]||['dashboard'];
+    return (
+      <div className={`fixed left-0 top-0 h-full bg-white shadow-xl transition-all z-50 sidebar flex flex-col ${sidebarOpen?'w-64':'w-20'}`}>
+        <div className="p-4 border-b flex items-center justify-between" style={{background:'linear-gradient(135deg,#1e3a5f,#2563eb)',minHeight:'64px'}}>
+          {sidebarOpen&&<div className="flex items-center gap-3"><div className="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0"><i className="fas fa-book-open text-white text-sm"></i></div><span className="font-bold text-white text-sm leading-tight">Sistem Laporan<br/>Perpustakaan</span></div>}
+          <button onClick={()=>setSidebarOpen(v=>!v)} className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg text-white flex-shrink-0"><i className={`fas ${sidebarOpen?'fa-chevron-left':'fa-bars'} text-sm`}></i></button>
+        </div>
+        {sidebarOpen&&<div className="px-4 py-3 border-b bg-gray-50"><div className="flex items-center gap-3"><div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0"><i className={`fas ${currentUser.role==='admin'?'fa-crown':currentUser.role==='editor'?'fa-pen':'fa-eye'} text-blue-600 text-xs`}></i></div><div className="min-w-0"><p className="text-sm font-semibold text-gray-800 truncate">{currentUser.nama}</p><span className={`role-badge ${ROLE_CLASS[currentUser.role]} text-xs mt-0.5`}>{ROLE_LABEL[currentUser.role]}</span></div></div></div>}
+        <nav className="p-3 space-y-1 flex-1 sidebar-nav">
+          {TAB_CONFIG.filter(t=>tabs.includes(t.key)).map(item=>(
+            <button key={item.key} onClick={()=>setCurrentView(item.key)}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition font-medium text-sm ${currentView===item.key?'bg-blue-600 text-white shadow-md':'text-gray-600 hover:bg-gray-100'}`}>
+              <i className={`fas ${item.icon} ${sidebarOpen?'w-4 text-center':'mx-auto'} ${currentView===item.key?'text-white':'text-gray-500'}`}></i>
+              {sidebarOpen&&<span>{item.label}</span>}
             </button>
+          ))}
+        </nav>
+        <div className="p-3 border-t">
+          {/* Ikon Setting untuk Urus Pengguna (hanya untuk admin) */}
+          {currentUser.role === 'admin' && (
+            <button onClick={()=>setCurrentView('urus-pengguna')} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-gray-600 hover:bg-gray-100 transition font-medium text-sm mb-1">
+              <i className={`fas fa-cog ${sidebarOpen?'w-4 text-center':'mx-auto'}`}></i>
+              {sidebarOpen&&<span>Urus Pengguna</span>}
+            </button>
+          )}
+          <button onClick={onLogout} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-red-500 hover:bg-red-50 transition font-medium text-sm">
+            <i className={`fas fa-sign-out-alt ${sidebarOpen?'w-4 text-center':'mx-auto'}`}></i>
+            {sidebarOpen&&<span>Log Keluar</span>}
+          </button>
+        </div>
+      </div>
+    );
+  });
+
+  // ══════════════════════════════════════════════
+  // DASHBOARD VIEW
+  // ══════════════════════════════════════════════
+  const DashboardView = memo(({ dataEntries, kpis }) => {
+    const sectionTotals=useMemo(()=>{ const t={}; dataEntries.forEach(e=>{ const total=e.format!==3?MONTHS.reduce((s,m)=>s+(e[m]||0),0):(parseInt(e.col1)||0)+(parseInt(e.col2)||0); t[e.section]=(t[e.section]||0)+total; }); return t; },[dataEntries]);
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100"><h1 className="text-2xl font-bold text-gray-800 mb-1">Dashboard Statistik</h1><p className="text-gray-500 text-sm">KPI BERDASARKAN BAHAGIAN · KUMULATIF 2026</p></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <KPICard title="Jumlah Transaksi 2026" value={kpis.total2026} previous={kpis.total2025} percentage={kpis.percentage} gradient="gradient-blue" icon={<svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>} />
+          <KPICard title="A. Perkhidmatan Koleksi" value={kpis.pinjaman2026} previous={kpis.pinjaman2025} percentage={kpis.percentage} gradient="gradient-pink" icon={<svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>} />
+          <KPICard title="B. Pinjaman Antara" value={kpis.pemulangan2026} previous={kpis.pemulangan2025} percentage={kpis.percentage} gradient="gradient-cyan" icon={<svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd"/></svg>} />
+          <KPICard title="C. Pusat Wilayah" value={kpis.pembaharuan2026} previous={kpis.pembaharuan2025} percentage={kpis.percentage} gradient="gradient-green" icon={<svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd"/></svg>} />
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <h2 className="text-lg font-bold text-gray-800 mb-6">Ringkasan mengikut Bahagian (2026)</h2>
+          <div className="space-y-4">
+            {Object.entries(sectionTotals).map(([section,total])=>{
+              const prev=Math.floor(total*0.82),max=Math.max(total,prev,1);
+              return (<div key={section}><div className="flex justify-between text-sm mb-1"><span className="font-medium">{section}</span><span className="text-blue-600">{total.toLocaleString()} (2026) · {prev.toLocaleString()} (2025)</span></div><div className="relative h-8 bg-gray-100 rounded overflow-hidden"><div className="absolute left-0 top-0 h-full bg-blue-500 rounded" style={{width:`${(total/max)*100}%`}}/><div className="absolute left-0 bottom-0 h-4 bg-gray-400" style={{width:`${(prev/max)*100}%`}}/></div></div>);
+            })}
           </div>
+        </div>
+      </div>
+    );
+  });
 
-          {Object.entries(organizedSections).map(([sectionName, group]) => {
-            const format = group.format; 
-            const format3sample = group.entries.find(e => e.format === 3);
+  // ══════════════════════════════════════════════
+  // DATA TAHUNAN VIEW — dengan popup tambah baru
+  // ══════════════════════════════════════════════
+  const DataTahunanView = memo(({
+    sectionOrder, organizedSections,
+    moveItem, addHeading, addSubheading, addNewSection,
+    addHeadingAndSection, addSubheadingAndSection,
+    renameOrderItem, deleteOrderItem,
+    addRowToSection, deleteEntry, updateEntry, updateMonthValue, updateFormat3Headers
+  }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // Compute items with numbers for display
+    const itemsWithNumbers = useMemo(() => {
+      let headingCounter = 0;
+      let subCounter = 0;
+      let currentHeadingId = null;
+      const result = [];
+      for (const item of sectionOrder) {
+        if (item.type === 'heading') {
+          headingCounter++;
+          const letter = String.fromCharCode(64 + headingCounter); // A=65
+          result.push({ ...item, displayPrefix: letter + '.', baseName: item.baseName });
+          currentHeadingId = item.id;
+          subCounter = 0;
+        } else if (item.type === 'subheading') {
+          subCounter++;
+          const roman = toRoman(subCounter);
+          result.push({ ...item, displayPrefix: roman + ')', baseName: item.baseName });
+        } else {
+          // section
+          result.push({ ...item, displayPrefix: null, name: item.name });
+        }
+      }
+      return result;
+    }, [sectionOrder]);
+
+    const handleAddOption = (type) => {
+      setIsModalOpen(false);
+      if (type === 'heading') addHeading();
+      else if (type === 'subheading') addSubheading();
+      else if (type === 'section') addNewSection();
+      else if (type === 'heading+section') addHeadingAndSection();
+      else if (type === 'subheading+section') addSubheadingAndSection();
+    };
+
+    return (
+      <div className="space-y-3">
+        {/* Header bar with single button */}
+        <div className="bg-white rounded-2xl shadow-sm p-5 flex flex-wrap justify-between items-center gap-3 border border-gray-100">
+          <div><h1 className="text-2xl font-bold mb-0.5">Data Tahunan - Input</h1><p className="text-gray-500 text-sm">Urus bahagian, heading dan data</p></div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-sm shadow"
+          >
+            <i className="fas fa-plus"></i> Tambah Baru
+          </button>
+        </div>
+
+        {/* Modal */}
+        {isModalOpen && (
+          <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <h2 className="modal-title">Pilih Jenis Item</h2>
+              <div className="modal-option" onClick={() => handleAddOption('heading')}>
+                <i className="fas fa-heading"></i>
+                <span>Heading sahaja</span>
+              </div>
+              <div className="modal-option" onClick={() => handleAddOption('heading+section')}>
+                <i className="fas fa-heading"></i>
+                <i className="fas fa-plus ml-1 mr-1"></i>
+                <i className="fas fa-table"></i>
+                <span>Heading + Bahagian Data</span>
+              </div>
+              <div className="modal-option" onClick={() => handleAddOption('subheading+section')}>
+                <i className="fas fa-h-square"></i>
+                <i className="fas fa-plus ml-1 mr-1"></i>
+                <i className="fas fa-table"></i>
+                <span>SubHeading + Bahagian Data</span>
+              </div>
+              <button onClick={() => setIsModalOpen(false)} className="mt-4 w-full py-2 bg-gray-200 rounded-lg hover:bg-gray-300 font-medium">
+                Batal
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Items */}
+        {itemsWithNumbers.map((item, idx) => {
+          const isFirst = idx === 0;
+          const isLast = idx === itemsWithNumbers.length - 1;
+
+          // ── HEADING ──────────────────────────────────
+          if (item.type === 'heading') {
             return (
-              <div key={sectionName} className="bg-white rounded-xl shadow-lg p-6">
-                <div className="flex justify-between items-center mb-4 pb-4 border-b-2">
-                  <input
-                    type="text"
-                    value={sectionName}
-                    onChange={(e) => renameSection(sectionName, e.target.value)}
-                    className="text-xl font-bold text-gray-800 bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500"
-                  />
-                  <button onClick={() => addRowToSection(sectionName, format)}
-                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium">
-                    + Tambah Row
-                  </button>
+              <div key={item.id} className="rounded-xl shadow overflow-hidden">
+                <div className="dt-heading flex items-center px-5 py-4 gap-3">
+                  <i className="fas fa-heading text-white text-lg opacity-80"></i>
+                  <div className="flex items-center flex-1">
+                    <span className="text-white font-bold text-lg mr-2">{item.displayPrefix}</span>
+                    <InlineEditInput value={item.baseName} onCommit={v=>renameOrderItem(item.id, v)}
+                      textClass="text-white font-bold text-lg" />
+                  </div>
+                  <div className="flex items-center gap-1.5 ml-2">
+                    <button className="move-btn" disabled={isFirst} onClick={()=>moveItem(idx,'up')} title="Gerak atas"><i className="fas fa-chevron-up text-xs"></i></button>
+                    <button className="move-btn" disabled={isLast} onClick={()=>moveItem(idx,'down')} title="Gerak bawah"><i className="fas fa-chevron-down text-xs"></i></button>
+                    <button onClick={()=>deleteOrderItem(item.id,'heading')}
+                      className="w-7 h-7 rounded-md bg-red-500 bg-opacity-80 hover:bg-opacity-100 flex items-center justify-center text-white" title="Padam heading">
+                      <i className="fas fa-times text-xs"></i>
+                    </button>
+                  </div>
                 </div>
+              </div>
+            );
+          }
 
-                {format === 3 && format3sample && (
+          // ── SUBHEADING ────────────────────────────────
+          if (item.type === 'subheading') {
+            return (
+              <div key={item.id} className="rounded-xl shadow overflow-hidden">
+                <div className="dt-subheading flex items-center px-5 py-3 gap-3">
+                  <i className="fas fa-minus text-white opacity-60 ml-4"></i>
+                  <div className="flex items-center flex-1">
+                    <span className="text-white font-semibold text-base mr-2">{item.displayPrefix}</span>
+                    <InlineEditInput value={item.baseName} onCommit={v=>renameOrderItem(item.id, v)}
+                      textClass="text-white font-semibold text-base" />
+                  </div>
+                  <div className="flex items-center gap-1.5 ml-2">
+                    <button className="move-btn" disabled={isFirst} onClick={()=>moveItem(idx,'up')} title="Gerak atas"><i className="fas fa-chevron-up text-xs"></i></button>
+                    <button className="move-btn" disabled={isLast} onClick={()=>moveItem(idx,'down')} title="Gerak bawah"><i className="fas fa-chevron-down text-xs"></i></button>
+                    <button onClick={()=>deleteOrderItem(item.id,'subheading')}
+                      className="w-7 h-7 rounded-md bg-red-500 bg-opacity-80 hover:bg-opacity-100 flex items-center justify-center text-white" title="Padam subheading">
+                      <i className="fas fa-times text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          // ── SECTION ───────────────────────────────────
+          const group = organizedSections[item.name];
+          if (!group) return null;
+          const format = group.format;
+          const format3sample = group.entries.find(e=>e.format===3);
+
+          return (
+            <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              {/* Section header */}
+              <div className="flex items-center px-5 py-4 border-b-2 border-gray-100 gap-3">
+                <div className="flex flex-col gap-1 mr-1">
+                  <button className="move-btn" disabled={isFirst} onClick={()=>moveItem(idx,'up')} title="Gerak atas"><i className="fas fa-chevron-up text-xs"></i></button>
+                  <button className="move-btn" disabled={isLast} onClick={()=>moveItem(idx,'down')} title="Gerak bawah"><i className="fas fa-chevron-down text-xs"></i></button>
+                </div>
+                <div className="flex-1">
+                  <SectionNameInput value={item.name} onCommit={v=>renameOrderItem(item.id, v, item.name)} />
+                </div>
+                <button onClick={()=>addRowToSection(item.name,format)}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm flex-shrink-0">
+                  <i className="fas fa-plus"></i> Tambah Row
+                </button>
+                <button onClick={()=>deleteOrderItem(item.id,'section',item.name)}
+                  className="flex items-center gap-2 px-3 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg font-medium text-sm flex-shrink-0">
+                  <i className="fas fa-trash"></i> Padam
+                </button>
+              </div>
+
+              <div className="p-5">
+                {/* Format 3 headers */}
+                {format===3 && format3sample && (
                   <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h3 className="font-semibold mb-2 text-sm">Tajuk Lajur (Custom)</h3>
+                    <h3 className="font-semibold mb-3 text-sm text-blue-800"><i className="fas fa-columns mr-2"></i>Tajuk Lajur</h3>
                     <div className="grid grid-cols-3 gap-3">
-                      {[1,2,3].map(num => (
-                        <div key={num}>
-                          <label className="text-xs font-medium">Lajur {num}</label>
-                          <input type="text" value={format3sample[`colHeader${num}`] || ''}
-                            onChange={(e) => updateFormat3Headers(sectionName, num, e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg mt-1" />
+                      {[1,2,3].map(num=>(
+                        <div key={num}><label className="text-xs font-medium block mb-1">Lajur {num}</label>
+                          <TextFieldInput value={format3sample[`colHeader${num}`]||''} onCommit={v=>updateFormat3Headers(item.name,num,v)} className="w-full px-3 py-2 border rounded-lg text-sm" />
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {group.entries.map(entry => (
-                  <div key={entry.id} className="mb-4 pb-4 border-b last:border-b-0">
-                    <div className="grid md:grid-cols-5 gap-4 mb-3">
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">Format</label>
-                        <select value={entry.format} onChange={(e) => updateEntry(entry.id, 'format', parseInt(e.target.value))}
-                          className="w-full px-3 py-2 border rounded-lg">
-                          <option value="1">Format 1</option>
-                          <option value="2">Format 2</option>
-                          <option value="3">Format 3</option>
-                        </select>
-                      </div>
-                      {entry.format === 1 && (
-                        <div>
-                          <label className="text-sm font-medium mb-1 block">Kategori</label>
-                          <input type="text" value={entry.category || ''}
-                            onChange={(e) => updateEntry(entry.id, 'category', e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg" />
+                {/* Entries */}
+                {group.entries.map(entry=>(
+                  <EntryRow key={entry.id} entry={entry} onUpdate={updateEntry} onDelete={deleteEntry} onMonthCommit={updateMonthValue} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+
+        {itemsWithNumbers.length===0 && (
+          <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">
+            <i className="fas fa-folder-open text-gray-300 text-5xl mb-4"></i>
+            <p className="text-gray-400 font-medium">Tiada item. Tambah Heading, Subheading atau Bahagian.</p>
+          </div>
+        )}
+      </div>
+    );
+  });
+
+  // ══════════════════════════════════════════════
+  // LAPORAN BULANAN VIEW
+  // ══════════════════════════════════════════════
+  const LaporanBulananView = memo(({ organizedSections, sectionOrder, sectionComments, updateSectionComment, role }) => {
+    const [selectedMonth,setSelectedMonth]=useState('JANUARI');
+    const prevMonth=getPrevMonth(selectedMonth);
+    const displayColumns=prevMonth?[prevMonth,selectedMonth]:[selectedMonth];
+
+    // Render sections in sectionOrder order (skip headings/subheadings for laporan)
+    const orderedSections = sectionOrder
+      .filter(item => item.type === 'section' && organizedSections[item.name])
+      .map(item => [item.name, organizedSections[item.name]]);
+
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-2xl shadow-sm p-6 no-print border border-gray-100">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-bold">Laporan Bulanan</h1>
+              <select value={selectedMonth} onChange={e=>setSelectedMonth(e.target.value)} className="px-4 py-2 border-2 rounded-lg font-medium text-base">
+                {MONTHS.map(m=><option key={m} value={m}>{m}</option>)}
+              </select>
+            </div>
+            <button onClick={()=>window.print()} className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm shadow">
+              <i className="fas fa-print"></i> Cetak
+            </button>
+          </div>
+        </div>
+
+        <div id="laporan-content">
+          {orderedSections.map(([sectionName, group], idx) => {
+            const {format,entries}=group;
+            if(format===3) return null;
+
+            if(format===1){
+              const categories={};
+              entries.forEach(e=>{if(!categories[e.category])categories[e.category]=[];categories[e.category].push(e);});
+              let grandTotalMonth=0,grandTotalPrev=0,grandTotalCum=0;
+              const catTotals=Object.keys(categories).map(catName=>({name:catName,prev:prevMonth?categories[catName].reduce((s,e)=>s+(e[prevMonth]||0),0):null,current:categories[catName].reduce((s,e)=>s+(e[selectedMonth]||0),0)}));
+              const maxChartVal=Math.max(...catTotals.flatMap(c=>[c.current,c.prev||0]),1);
+              const chartTicks=[0,Math.round(maxChartVal*0.25),Math.round(maxChartVal*0.5),Math.round(maxChartVal*0.75),maxChartVal];
+              return (
+                <div key={sectionName} className="print-section bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                  {idx===0&&(<div className="mb-6 pb-4 border-b-2 border-gray-800"><div className="print-header text-lg font-extrabold">BAHAGIAN SIRKULASI</div><div className="print-header text-base font-bold">PERPUSTAKAAN HAMZAH SENDUT</div><div className="print-header text-base font-bold">LAPORAN BULANAN {selectedMonth} 2026</div></div>)}
+                  <h2 className="section-title text-base font-bold mb-4">{sectionName}</h2>
+                  <table className="w-full border-collapse mb-6">
+                    <thead><tr>
+                      <th className="border border-black px-4 py-2 text-center font-bold bg-gray-50" colSpan="2">KATEGORI</th>
+                      {displayColumns.map(col=><th key={col} className="border border-black px-4 py-2 text-center font-bold bg-gray-50 w-32">{col}</th>)}
+                      <th className="border border-black px-4 py-2 text-center font-bold bg-gray-50 w-32">KUMULATIF</th>
+                    </tr></thead>
+                    <tbody>
+                      {Object.entries(categories).map(([catName,catEntries])=>{
+                        const catMonthTotal=catEntries.reduce((s,e)=>s+(e[selectedMonth]||0),0);
+                        const catPrevTotal=prevMonth?catEntries.reduce((s,e)=>s+(e[prevMonth]||0),0):0;
+                        const catCumTotal=catEntries.reduce((s,e)=>s+calculateKumulatif(e,selectedMonth),0);
+                        grandTotalMonth+=catMonthTotal;grandTotalPrev+=catPrevTotal;grandTotalCum+=catCumTotal;
+                        return (<React.Fragment key={catName}>
+                          {catEntries.map((item,itemIdx)=>(
+                            <tr key={item.id}>
+                              {itemIdx===0&&<td className="border border-black px-4 py-2 font-bold align-top" rowSpan={catEntries.length}>{catName}</td>}
+                              <td className="border border-black px-4 py-2">{item.item}</td>
+                              {displayColumns.map(col=><td key={col} className="border border-black px-4 py-2 text-center">{(col===selectedMonth?(item[selectedMonth]||0):(item[prevMonth]||0)).toLocaleString()}</td>)}
+                              <td className="border border-black px-4 py-2 text-center">{calculateKumulatif(item,selectedMonth).toLocaleString()}</td>
+                            </tr>
+                          ))}
+                          <tr className="font-bold bg-gray-50">
+                            <td className="border border-black px-4 py-2" colSpan="2">Jumlah</td>
+                            {displayColumns.map(col=><td key={col} className="border border-black px-4 py-2 text-center">{(col===selectedMonth?catMonthTotal:catPrevTotal).toLocaleString()}</td>)}
+                            <td className="border border-black px-4 py-2 text-center">{catCumTotal.toLocaleString()}</td>
+                          </tr>
+                        </React.Fragment>);
+                      })}
+                      <tr className="font-bold bg-gray-200">
+                        <td className="border border-black px-4 py-2" colSpan="2">JUMLAH BESAR</td>
+                        {displayColumns.map(col=><td key={col} className="border border-black px-4 py-2 text-center">{(col===selectedMonth?grandTotalMonth:grandTotalPrev).toLocaleString()}</td>)}
+                        <td className="border border-black px-4 py-2 text-center">{grandTotalCum.toLocaleString()}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  {catTotals.length>0&&(
+                    <div className="chart-container mb-6">
+                      <h3 className="text-sm font-bold mb-3 text-gray-700">Graf: {sectionName}</h3>
+                      <div className="chart-with-axis">
+                        <div className="y-axis">{chartTicks.slice().reverse().map(tick=><span key={tick}>{tick.toLocaleString()}</span>)}</div>
+                        <div className="bars-container" style={{gap:'1.5rem'}}>
+                          {catTotals.map(cat=>(
+                            <div key={cat.name} style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+                              <div style={{display:'flex',alignItems:'flex-end',gap:'4px'}}>
+                                {prevMonth&&cat.prev!==null&&(<div style={{display:'flex',flexDirection:'column',alignItems:'center',width:'30px'}}><div style={{fontSize:'9px',fontWeight:'bold',marginBottom:'2px'}}>{cat.prev.toLocaleString()}</div><div style={{width:'100%',backgroundColor:'#3b82f6',height:`${(cat.prev/maxChartVal)*180}px`,borderRadius:'3px 3px 0 0'}}></div></div>)}
+                                <div style={{display:'flex',flexDirection:'column',alignItems:'center',width:'30px'}}><div style={{fontSize:'9px',fontWeight:'bold',marginBottom:'2px'}}>{cat.current.toLocaleString()}</div><div style={{width:'100%',backgroundColor:'#1d4ed8',height:`${(cat.current/maxChartVal)*180}px`,borderRadius:'3px 3px 0 0'}}></div></div>
+                              </div>
+                              <div style={{fontSize:'10px',marginTop:'6px',textAlign:'center',maxWidth:'70px',wordBreak:'break-word'}}>{cat.name}</div>
+                            </div>
+                          ))}
                         </div>
-                      )}
-                      <div className={entry.format === 1 ? '' : 'md:col-span-2'}>
-                        <label className="text-sm font-medium mb-1 block">Item</label>
-                        <input type="text" value={entry.item || ''}
-                            onChange={(e) => updateEntry(entry.id, 'item', e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg" />
                       </div>
-                      <div className="flex items-end md:col-span-2">
-                        <button onClick={() => deleteEntry(entry.id)}
-                          className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium">
-                          🗑 Padam
-                        </button>
+                      <div className="flex justify-center mt-3 text-xs gap-4">
+                        {prevMonth&&<div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-sm"></div>{prevMonth}</div>}
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-800 rounded-sm"></div>{selectedMonth}</div>
                       </div>
                     </div>
+                  )}
+                  <div className="ulasan-section"><h3 className="font-bold mb-2">ULASAN</h3><UlasanTextarea value={sectionComments[sectionName]||''} onCommit={v=>updateSectionComment(sectionName,v)} readOnly={role==='viewer'} /></div>
+                </div>
+              );
+            }
 
-                    {entry.format === 3 ? (
-                      <div className="grid grid-cols-3 gap-3 bg-gray-50 p-3 rounded-lg">
-                        <div>
-                          <label className="text-xs font-medium mb-1 block">{entry.colHeader1 || 'Lajur 1'}</label>
-                          <input type="text" value={entry.col1 || ''}
-                            onChange={(e) => updateEntry(entry.id, 'col1', e.target.value)}
-                            className="w-full px-2 py-1 border rounded text-center" />
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium mb-1 block">{entry.colHeader2 || 'Lajur 2'}</label>
-                          <input type="text" value={entry.col2 || ''}
-                            onChange={(e) => updateEntry(entry.id, 'col2', e.target.value)}
-                            className="w-full px-2 py-1 border rounded text-center" />
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium mb-1 block">{entry.colHeader3 || 'Lajur 3'}</label>
-                          <input type="text" value={entry.col3 || ''}
-                            onChange={(e) => updateEntry(entry.id, 'col3', e.target.value)}
-                            className="w-full px-2 py-1 border rounded text-center" />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 bg-gray-50 p-3 rounded-lg">
-                        {MONTHS.map(month => (
-                          <div key={month}>
-                            <label className="text-xs font-medium mb-1 block">{month.substring(0,3)}</label>
-                            <input type="number" step="any" value={entry[month] || 0}
-                              onChange={(e) => updateMonthValue(entry.id, month, e.target.value)}
-                              className="w-full px-2 py-1 border rounded text-center text-sm" />
+            // Format 2
+            let grandTotalCurrent=0,grandTotalPrev=0,grandTotalCum=0;
+            const tableRows=entries.map(item=>{const current=item[selectedMonth]||0,prev=prevMonth?(item[prevMonth]||0):0,cum=calculateKumulatif(item,selectedMonth);grandTotalCurrent+=current;grandTotalPrev+=prev;grandTotalCum+=cum;return{id:item.id,category:item.item,current,prev,cum,item};});
+            const allVals=entries.flatMap(i=>[i[selectedMonth]||0,prevMonth?(i[prevMonth]||0):0]);
+            const maxChartVal2=Math.max(...allVals,1);
+            const chartTicks2=[0,Math.round(maxChartVal2*0.25),Math.round(maxChartVal2*0.5),Math.round(maxChartVal2*0.75),maxChartVal2];
+            return (
+              <div key={sectionName} className="print-section bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                {idx===0&&(<div className="mb-6 pb-4 border-b-2 border-gray-800"><div className="print-header text-lg font-extrabold">BAHAGIAN SIRKULASI</div><div className="print-header text-base font-bold">PERPUSTAKAAN HAMZAH SENDUT</div><div className="print-header text-base font-bold">LAPORAN BULANAN {selectedMonth} 2026</div></div>)}
+                <h2 className="section-title text-base font-bold mb-4">{sectionName}</h2>
+                <table className="w-full border-collapse mb-6">
+                  <thead><tr>
+                    <th className="border border-black px-4 py-2 text-left font-bold bg-gray-50">KATEGORI</th>
+                    {displayColumns.map(col=><th key={col} className="border border-black px-4 py-2 text-center font-bold bg-gray-50 w-32">{col}</th>)}
+                    <th className="border border-black px-4 py-2 text-center font-bold bg-gray-50 w-32">KUMULATIF</th>
+                  </tr></thead>
+                  <tbody>
+                    {tableRows.map(row=>(<tr key={row.id}><td className="border border-black px-4 py-2">{row.category}</td>{displayColumns.map(col=><td key={col} className="border border-black px-4 py-2 text-center">{(col===selectedMonth?row.current:row.prev).toLocaleString()}</td>)}<td className="border border-black px-4 py-2 text-center">{row.cum.toLocaleString()}</td></tr>))}
+                    <tr className="font-bold bg-gray-100"><td className="border border-black px-4 py-2">JUMLAH</td>{displayColumns.map(col=><td key={col} className="border border-black px-4 py-2 text-center">{(col===selectedMonth?grandTotalCurrent:grandTotalPrev).toLocaleString()}</td>)}<td className="border border-black px-4 py-2 text-center">{grandTotalCum.toLocaleString()}</td></tr>
+                  </tbody>
+                </table>
+                <div className="chart-container mb-6">
+                  <h3 className="text-sm font-bold mb-3 text-gray-700">Graf: {sectionName}</h3>
+                  <div className="chart-with-axis">
+                    <div className="y-axis">{chartTicks2.slice().reverse().map(tick=><span key={tick}>{tick.toLocaleString()}</span>)}</div>
+                    <div className="bars-container" style={{gap:'1.5rem'}}>
+                      {entries.map(item=>{const current=item[selectedMonth]||0,prev=prevMonth?(item[prevMonth]||0):null;return(
+                        <div key={item.id} style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+                          <div style={{display:'flex',alignItems:'flex-end',gap:'4px'}}>
+                            {prevMonth&&prev!==null&&(<div style={{display:'flex',flexDirection:'column',alignItems:'center',width:'30px'}}><div style={{fontSize:'9px',fontWeight:'bold',marginBottom:'2px'}}>{prev.toLocaleString()}</div><div style={{width:'100%',backgroundColor:'#3b82f6',height:`${(prev/maxChartVal2)*180}px`,borderRadius:'3px 3px 0 0'}}></div></div>)}
+                            <div style={{display:'flex',flexDirection:'column',alignItems:'center',width:'30px'}}><div style={{fontSize:'9px',fontWeight:'bold',marginBottom:'2px'}}>{current.toLocaleString()}</div><div style={{width:'100%',backgroundColor:'#1d4ed8',height:`${(current/maxChartVal2)*180}px`,borderRadius:'3px 3px 0 0'}}></div></div>
                           </div>
-                        ))}
-                      </div>
-                    )}
+                          <div style={{fontSize:'10px',marginTop:'6px',textAlign:'center',maxWidth:'70px',wordBreak:'break-word'}}>{item.item}</div>
+                        </div>
+                      );})}
+                    </div>
                   </div>
-                ))}
+                  <div className="flex justify-center mt-3 text-xs gap-4">
+                    {prevMonth&&<div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-sm"></div>{prevMonth}</div>}
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-800 rounded-sm"></div>{selectedMonth}</div>
+                  </div>
+                </div>
+                <div className="ulasan-section"><h3 className="font-bold mb-2">ULASAN</h3><UlasanTextarea value={sectionComments[sectionName]||''} onCommit={v=>updateSectionComment(sectionName,v)} readOnly={role==='viewer'} /></div>
               </div>
             );
           })}
         </div>
-      );
+      </div>
+    );
+  });
 
-      // Helper to save as Word .doc
-      const saveAsWord = () => {
-        const content = document.querySelector('.laporan-container')?.innerHTML || '';
-        const blob = new Blob([`
-          <html>
-            <head><meta charset="UTF-8"><title>Laporan Bulanan</title></head>
-            <body>${content}</body>
-          </html>
-        `], { type: 'application/msword' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Laporan_${new Date().toISOString().slice(0,10)}.doc`;
-        a.click();
-        URL.revokeObjectURL(url);
-      };
+  // ══════════════════════════════════════════════
+  // APP
+  // ══════════════════════════════════════════════
+  function App() {
+    const [currentUser,setCurrentUser]=useState(null);
+    const [users,setUsers]=useState(DEFAULT_USERS);
+    const [currentView,setCurrentView]=useState('dashboard');
+    const [sidebarOpen,setSidebarOpen]=useState(true);
 
-      // Upload to OneDrive simulation (just file picker)
-      const uploadToOnedrive = () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.pdf';
-        input.onchange = (e) => {
-          const file = e.target.files[0];
-          if (file) {
-            alert(`Fail "${file.name}" dipilih. (Simulasi upload ke OneDrive)`);
+    const handleLogin=useCallback(user=>{setCurrentUser(user);setCurrentView('dashboard');},[]);
+    const handleLogout=useCallback(()=>{setCurrentUser(null);setCurrentView('dashboard');},[]);
+
+    const [dataEntries,setDataEntries]=useState([
+      {id:1,section:'A. PERKHIDMATAN KOLEKSI',format:1,category:'PINJAMAN',item:'Rak Terbuka',JANUARI:532,FEBRUARI:450,MAC:480,APRIL:510,MEI:490,JUN:520,JULAI:540,OGOS:500,SEPTEMBER:530,OKTOBER:550,NOVEMBER:560,DISEMBER:570},
+      {id:2,section:'A. PERKHIDMATAN KOLEKSI',format:1,category:'PINJAMAN',item:'Course Reserve',JANUARI:6,FEBRUARI:8,MAC:7,APRIL:9,MEI:8,JUN:10,JULAI:9,OGOS:8,SEPTEMBER:7,OKTOBER:9,NOVEMBER:8,DISEMBER:7},
+      {id:8,section:'A. PERKHIDMATAN KOLEKSI',format:1,category:'PINJAMAN',item:'Rak Padat',JANUARI:120,FEBRUARI:115,MAC:130,APRIL:125,MEI:140,JUN:135,JULAI:145,OGOS:140,SEPTEMBER:150,OKTOBER:155,NOVEMBER:160,DISEMBER:165},
+      {id:3,section:'A. PERKHIDMATAN KOLEKSI',format:1,category:'PEMULANGAN',item:'Rak Terbuka',JANUARI:1859,FEBRUARI:1650,MAC:1700,APRIL:1750,MEI:1680,JUN:1720,JULAI:1800,OGOS:1760,SEPTEMBER:1790,OKTOBER:1820,NOVEMBER:1850,DISEMBER:1880},
+      {id:9,section:'A. PERKHIDMATAN KOLEKSI',format:1,category:'PEMULANGAN',item:'Course Reserve',JANUARI:45,FEBRUARI:42,MAC:38,APRIL:50,MEI:47,JUN:52,JULAI:49,OGOS:55,SEPTEMBER:53,OKTOBER:58,NOVEMBER:60,DISEMBER:62},
+      {id:10,section:'A. PERKHIDMATAN KOLEKSI',format:1,category:'PEMULANGAN',item:'Rak Padat',JANUARI:210,FEBRUARI:200,MAC:215,APRIL:220,MEI:230,JUN:225,JULAI:240,OGOS:235,SEPTEMBER:250,OKTOBER:245,NOVEMBER:260,DISEMBER:255},
+      {id:4,section:'A. PERKHIDMATAN KOLEKSI',format:1,category:'TEMPATAN',item:'Rak Terbuka',JANUARI:720,FEBRUARI:700,MAC:750,APRIL:730,MEI:780,JUN:760,JULAI:800,OGOS:790,SEPTEMBER:820,OKTOBER:810,NOVEMBER:850,DISEMBER:840},
+      {id:5,section:'B. PINJAMAN ANTARA PERPUSTAKAAN',format:2,category:'',item:'Berjaya',JANUARI:4,FEBRUARI:5,MAC:6,APRIL:5,MEI:7,JUN:6,JULAI:8,OGOS:7,SEPTEMBER:6,OKTOBER:5,NOVEMBER:7,DISEMBER:6},
+      {id:6,section:'B. PINJAMAN ANTARA PERPUSTAKAAN',format:2,category:'',item:'Gagal',JANUARI:2,FEBRUARI:1,MAC:2,APRIL:3,MEI:2,JUN:3,JULAI:2,OGOS:3,SEPTEMBER:2,OKTOBER:3,NOVEMBER:2,DISEMBER:3},
+      {id:7,section:'C. PUSAT WILAYAH',format:3,category:'',item:'Arau',colHeader1:'BUKU',colHeader2:'STAF',colHeader3:'TARIKH',col1:1520,col2:5,col3:'12-Jan-2025'}
+    ]);
+
+    // sectionOrder — controls display order & includes headings/subheadings
+    const [sectionOrder,setSectionOrder]=useState([
+      {id:'so_a',name:'A. PERKHIDMATAN KOLEKSI',type:'section'},
+      {id:'so_b',name:'B. PINJAMAN ANTARA PERPUSTAKAAN',type:'section'},
+      {id:'so_c',name:'C. PUSAT WILAYAH',type:'section'},
+    ]);
+
+    const [sectionComments,setSectionComments]=useState({});
+    const updateSectionComment=useCallback((section,text)=>setSectionComments(prev=>({...prev,[section]:text})),[]);
+
+    // Move item up/down in sectionOrder
+    const moveItem=useCallback((idx,dir)=>{
+      setSectionOrder(prev=>{
+        const arr=[...prev];
+        const target=dir==='up'?idx-1:idx+1;
+        if(target<0||target>=arr.length) return arr;
+        [arr[idx],arr[target]]=[arr[target],arr[idx]];
+        return arr;
+      });
+    },[]);
+
+    // Add heading (baseName sahaja)
+    const addHeading=useCallback(()=>{
+      setSectionOrder(prev=>[...prev,{id:'h_'+Date.now(),baseName:'TAJUK BARU',type:'heading'}]);
+    },[]);
+
+    // Add subheading (baseName sahaja)
+    const addSubheading=useCallback(()=>{
+      setSectionOrder(prev=>[...prev,{id:'sh_'+Date.now(),baseName:'Sub Tajuk Baru',type:'subheading'}]);
+    },[]);
+
+    // Add new data section
+    const addNewSection=useCallback(()=>{
+      const newName='BAHAGIAN BARU '+Date.now();
+      const newId='so_'+Date.now();
+      setDataEntries(prev=>[...prev,{id:Date.now(),section:newName,format:1,category:'KATEGORI',item:'Item',...Object.fromEntries(MONTHS.map(m=>[m,0]))}]);
+      setSectionOrder(prev=>[...prev,{id:newId,name:newName,type:'section'}]);
+    },[]);
+
+    // Add heading + section
+    const addHeadingAndSection = useCallback(() => {
+      const headingId = 'h_' + Date.now();
+      const headingBaseName = 'TAJUK BARU';
+      const sectionId = 'so_' + (Date.now() + 1);
+      const sectionName = 'BAHAGIAN DATA BARU ' + Date.now();
+      const newEntry = { id: Date.now() + 2, section: sectionName, format: 1, category: 'KATEGORI', item: 'Item', ...Object.fromEntries(MONTHS.map(m => [m, 0])) };
+      setDataEntries(prev => [...prev, newEntry]);
+      setSectionOrder(prev => [...prev, { id: headingId, baseName: headingBaseName, type: 'heading' }, { id: sectionId, name: sectionName, type: 'section' }]);
+    }, []);
+
+    // Add subheading + section
+    const addSubheadingAndSection = useCallback(() => {
+      const subheadingId = 'sh_' + Date.now();
+      const subheadingBaseName = 'Sub Tajuk Baru';
+      const sectionId = 'so_' + (Date.now() + 1);
+      const sectionName = 'BAHAGIAN DATA BARU ' + Date.now();
+      const newEntry = { id: Date.now() + 2, section: sectionName, format: 1, category: 'KATEGORI', item: 'Item', ...Object.fromEntries(MONTHS.map(m => [m, 0])) };
+      setDataEntries(prev => [...prev, newEntry]);
+      setSectionOrder(prev => [...prev, { id: subheadingId, baseName: subheadingBaseName, type: 'subheading' }, { id: sectionId, name: sectionName, type: 'section' }]);
+    }, []);
+
+    // Rename any order item
+    const renameOrderItem = useCallback((id, newName, oldSectionName) => {
+      setSectionOrder(prev => prev.map(item => {
+        if (item.id !== id) return item;
+        if (item.type === 'section') {
+          return { ...item, name: newName };
+        } else {
+          return { ...item, baseName: newName };
+        }
+      }));
+      if (oldSectionName) {
+        setDataEntries(prev => prev.map(e => e.section === oldSectionName ? { ...e, section: newName } : e));
+        setSectionComments(prev => {
+          const n = { ...prev };
+          if (prev[oldSectionName] !== undefined) {
+            n[newName] = prev[oldSectionName];
+            delete n[oldSectionName];
           }
-        };
-        input.click();
-      };
+          return n;
+        });
+      }
+    }, []);
 
-      const LaporanBulananView = () => {
-        const [selectedMonth, setSelectedMonth] = useState('JANUARI');
-        const prevMonth = getPrevMonth(selectedMonth);
-        const displayColumns = prevMonth ? [prevMonth, selectedMonth] : [selectedMonth];
+    // Delete order item
+    const deleteOrderItem=useCallback((id,type,sectionName)=>{
+      if(type==='section'){
+        if(!window.confirm(`Padam bahagian "${sectionName}" dan semua datanya?`)) return;
+        setDataEntries(prev=>prev.filter(e=>e.section!==sectionName));
+        setSectionComments(prev=>{const n={...prev};delete n[sectionName];return n;});
+      } else {
+        if(!window.confirm('Padam item ini?')) return;
+      }
+      setSectionOrder(prev=>prev.filter(item=>item.id!==id));
+    },[]);
 
-        return (
-          <div className="space-y-6 laporan-container">
-            <div className="bg-white rounded-2xl shadow-sm p-6 no-print">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                  <h1 className="text-2xl font-bold">Laporan Bulanan</h1>
-                  <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="px-4 py-2 border-2 rounded-lg font-medium">
-                    {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
-                  </select>
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={() => window.print()} 
-                    className="p-3 bg-blue-600 text-white rounded-lg hover:shadow-lg" title="Cetak">
-                    <i className="fas fa-print"></i>
-                  </button>
-                  <button onClick={saveAsWord} 
-                    className="p-3 bg-green-600 text-white rounded-lg hover:shadow-lg" title="Simpan ke Word">
-                    <i className="fas fa-file-word"></i>
-                  </button>
-                  <button onClick={uploadToOnedrive} 
-                    className="p-3 bg-purple-600 text-white rounded-lg hover:shadow-lg" title="Muat naik ke OneDrive">
-                    <i className="fas fa-cloud-upload-alt"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+    const addRowToSection=useCallback((sectionName,format)=>{
+      setDataEntries(prev=>{
+        const template=prev.find(e=>e.section===sectionName&&e.format===format);
+        const entry={id:Date.now(),section:sectionName,format,category:format===1?(template?.category||'KATEGORI'):'',item:'Item Baru'};
+        if(format===3){entry.colHeader1=template?.colHeader1||'COL1';entry.colHeader2=template?.colHeader2||'COL2';entry.colHeader3=template?.colHeader3||'COL3';entry.col1=0;entry.col2=0;entry.col3='';}
+        else{MONTHS.forEach(m=>entry[m]=0);}
+        return [...prev,entry];
+      });
+    },[]);
 
-            {Object.entries(organizedSections).map(([sectionName, group], idx) => {
-              const format = group.format;
-              const entries = group.entries;
+    const deleteEntry=useCallback(id=>{if(window.confirm('Padam entri ini?')) setDataEntries(prev=>prev.filter(e=>e.id!==id));},[]);
+    const updateEntry=useCallback((id,field,value)=>setDataEntries(prev=>prev.map(e=>e.id===id?{...e,[field]:value}:e)),[]);
+    const updateMonthValue=useCallback((id,month,value)=>setDataEntries(prev=>prev.map(e=>e.id===id?{...e,[month]:value}:e)),[]);
+    const updateFormat3Headers=useCallback((sectionName,headerNum,value)=>setDataEntries(prev=>prev.map(e=>(e.section===sectionName&&e.format===3)?{...e,[`colHeader${headerNum}`]:value}:e)),[]);
 
-              // FORMAT 1 – dengan bulan sebelumnya dan graf mengikut kategori (dengan paksi)
-              if (format === 1) {
-                const categories = {};
-                entries.forEach(e => {
-                  if (!categories[e.category]) categories[e.category] = [];
-                  categories[e.category].push(e);
-                });
+    const kpis=useMemo(()=>{
+      const st={};
+      dataEntries.forEach(e=>{const total=e.format!==3?MONTHS.reduce((s,m)=>s+(e[m]||0),0):(parseInt(e.col1)||0)+(parseInt(e.col2)||0);st[e.section]=(st[e.section]||0)+total;});
+      const t=Object.values(st).reduce((s,v)=>s+v,0),f=0.82;
+      const p=st['A. PERKHIDMATAN KOLEKSI']||0,b=st['B. PINJAMAN ANTARA PERPUSTAKAAN']||0,c=st['C. PUSAT WILAYAH']||0;
+      return{total2026:t,total2025:Math.floor(t*f),percentage:t>0?parseFloat((((t-Math.floor(t*f))/Math.floor(t*f))*100).toFixed(1)):0,pinjaman2026:p,pinjaman2025:Math.floor(p*f),pemulangan2026:b,pemulangan2025:Math.floor(b*f),pembaharuan2026:c,pembaharuan2025:Math.floor(c*f)};
+    },[dataEntries]);
 
-                let grandTotalMonth = 0, grandTotalPrev = 0, grandTotalCum = 0;
+    const organizedSections=useMemo(()=>{
+      const groups={};
+      dataEntries.forEach(e=>{if(!groups[e.section])groups[e.section]={format:e.format,entries:[]};groups[e.section].entries.push(e);});
+      return groups;
+    },[dataEntries]);
 
-                // Untuk graf, kita perlukan nilai kategori
-                const catValues = Object.entries(categories).map(([catName, catEntries]) => ({
-                  name: catName,
-                  value: catEntries.reduce((s, e) => s + (e[selectedMonth] || 0), 0)
-                }));
-                const maxVal = Math.max(...catValues.map(c => c.value), 1);
-                // Y-axis ticks
-                const yTicks = [0, Math.round(maxVal*0.25), Math.round(maxVal*0.5), Math.round(maxVal*0.75), maxVal];
+    if(!currentUser) return <LoginPage users={users} onLogin={handleLogin} />;
 
-                return (
-                  <div key={sectionName} className={`print-section bg-white rounded-2xl shadow-sm p-6`}>
-                    {idx === 0 && (
-                      <div className="mb-6">
-                        <div className="print-header">BAHAGIAN SIRKULASI</div>
-                        <div className="print-header">PERPUSTAKAAN HAMZAH SENDUT</div>
-                        <div className="print-header">LAPORAN BULANAN {selectedMonth} 2026</div>
-                      </div>
-                    )}
-
-                    <h2 className="section-title">{sectionName}</h2>
-
-                    <table className="w-full border-collapse mb-6">
-                      <thead>
-                        <tr>
-                          <th className="border border-black px-4 py-2 text-center font-bold bg-white" colSpan="2">KATEGORI</th>
-                          {displayColumns.map(col => (
-                            <th key={col} className="border border-black px-4 py-2 text-center font-bold bg-white w-32">{col}</th>
-                          ))}
-                          <th className="border border-black px-4 py-2 text-center font-bold bg-white w-32">KUMULATIF</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Object.entries(categories).map(([catName, catEntries]) => {
-                          const catMonthTotal = catEntries.reduce((s, e) => s + (e[selectedMonth] || 0), 0);
-                          const catPrevTotal = prevMonth ? catEntries.reduce((s, e) => s + (e[prevMonth] || 0), 0) : 0;
-                          const catCumTotal = catEntries.reduce((s, e) => s + calculateKumulatif(e, selectedMonth), 0);
-                          grandTotalMonth += catMonthTotal;
-                          grandTotalPrev += catPrevTotal;
-                          grandTotalCum += catCumTotal;
-
-                          return (
-                            <React.Fragment key={catName}>
-                              {catEntries.map((item, itemIdx) => (
-                                <tr key={item.id}>
-                                  {itemIdx === 0 && (
-                                    <td className="border border-black px-4 py-2 font-bold align-top" rowSpan={catEntries.length}>
-                                      {catName}
-                                    </td>
-                                  )}
-                                  <td className="border border-black px-4 py-2">{item.item}</td>
-                                  {displayColumns.map(col => (
-                                    <td key={col} className="border border-black px-4 py-2 text-center">
-                                      {(col === selectedMonth ? (item[selectedMonth] || 0) : (item[prevMonth] || 0)).toLocaleString()}
-                                    </td>
-                                  ))}
-                                  <td className="border border-black px-4 py-2 text-center">{calculateKumulatif(item, selectedMonth).toLocaleString()}</td>
-                                </tr>
-                              ))}
-                              <tr className="font-bold">
-                                <td className="border border-black px-4 py-2" colSpan="2">Jumlah</td>
-                                {displayColumns.map(col => (
-                                  <td key={col} className="border border-black px-4 py-2 text-center">
-                                    {(col === selectedMonth ? catMonthTotal : catPrevTotal).toLocaleString()}
-                                  </td>
-                                ))}
-                                <td className="border border-black px-4 py-2 text-center">{catCumTotal.toLocaleString()}</td>
-                              </tr>
-                            </React.Fragment>
-                          );
-                        })}
-                        <tr className="font-bold bg-gray-100">
-                          <td className="border border-black px-4 py-2" colSpan="2">JUMLAH BESAR</td>
-                          {displayColumns.map(col => (
-                            <td key={col} className="border border-black px-4 py-2 text-center">
-                              {(col === selectedMonth ? grandTotalMonth : grandTotalPrev).toLocaleString()}
-                            </td>
-                          ))}
-                          <td className="border border-black px-4 py-2 text-center">{grandTotalCum.toLocaleString()}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-
-                    {/* Graf dengan paksi */}
-                    {catValues.length > 0 && (
-                      <div className="chart-container mb-6">
-                        <h3 className="text-md font-bold mb-3 text-gray-800">Graf: {sectionName} – {selectedMonth}</h3>
-                        <div className="chart-with-axis">
-                          <div className="y-axis">
-                            {yTicks.slice().reverse().map(tick => (
-                              <span key={tick}>{tick.toLocaleString()}</span>
-                            ))}
-                          </div>
-                          <div className="bars-container">
-                            {catValues.map(cat => (
-                              <div key={cat.name} className="bar-wrapper">
-                                <div className="bar-value">{cat.value.toLocaleString()}</div>
-                                <div className="bar" style={{ height: `${(cat.value / maxVal) * 180}px` }}></div>
-                                <div className="bar-label">{cat.name}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex justify-center mt-3 text-xs">
-                          <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500"></div> {selectedMonth}</div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="ulasan-section">
-                      <h3 className="font-bold mb-2">ULASAN</h3>
-                      <textarea 
-                        value={sectionComments[sectionName] || ''} 
-                        onChange={(e) => updateSectionComment(sectionName, e.target.value)}
-                        disabled={currentUser.role === 'view'}
-                        rows="3" 
-                        className={`w-full border border-black p-3 rounded bg-white resize-y ${currentUser.role === 'view' ? 'bg-gray-100' : ''}`} 
-                        placeholder={currentUser.role === 'view' ? 'Ulasan hanya boleh dibaca' : 'Taip ulasan...'} 
-                        readOnly={currentUser.role === 'view'}
-                      />
-                    </div>
-                  </div>
-                );
-              }
-
-              // FORMAT 2 & 3 (similar, but we also add axes for format 2 graphs)
-              let tableRows = [], grandTotalCurrent = 0, grandTotalPrev = 0, grandTotalCum = 0;
-              if (format === 2) {
-                tableRows = entries.map(item => {
-                  const current = item[selectedMonth] || 0;
-                  const prev = prevMonth ? (item[prevMonth] || 0) : 0;
-                  const cum = calculateKumulatif(item, selectedMonth);
-                  grandTotalCurrent += current; grandTotalPrev += prev; grandTotalCum += cum;
-                  return { category: item.item, current, prev, cum, id: item.id, item };
-                });
-              } else if (format === 3) {
-                tableRows = entries.map(item => ({ category: item.item, col1: item.col1 || 0, col2: item.col2 || 0, col3: item.col3 || '', raw: item }));
-                grandTotalCurrent = entries.reduce((s, e) => s + (parseInt(e.col1)||0) + (parseInt(e.col2)||0), 0);
-              }
-
-              return (
-                <div key={sectionName} className={`print-section bg-white rounded-2xl shadow-sm p-6`}>
-                  {idx === 0 && (
-                    <div className="mb-6">
-                      <div className="print-header">BAHAGIAN SIRKULASI</div>
-                      <div className="print-header">PERPUSTAKAAN HAMZAH SENDUT</div>
-                      <div className="print-header">LAPORAN BULANAN {selectedMonth} 2026</div>
-                    </div>
-                  )}
-
-                  <h2 className="section-title">{sectionName}</h2>
-
-                  <table className="w-full border-collapse mb-6">
-                    <thead>
-                      <tr>
-                        <th className="border border-black px-4 py-2 text-left font-bold bg-white">KATEGORI</th>
-                        {format !== 3 && displayColumns.map(col => (
-                          <th key={col} className="border border-black px-4 py-2 text-center font-bold bg-white w-32">{col}</th>
-                        ))}
-                        {format === 3 && (
-                          <>
-                            <th className="border border-black px-4 py-2 text-center font-bold bg-white w-32">{entries[0]?.colHeader1 || 'COL1'}</th>
-                            <th className="border border-black px-4 py-2 text-center font-bold bg-white w-32">{entries[0]?.colHeader2 || 'COL2'}</th>
-                            <th className="border border-black px-4 py-2 text-center font-bold bg-white w-32">{entries[0]?.colHeader3 || 'COL3'}</th>
-                          </>
-                        )}
-                        {format !== 3 && <th className="border border-black px-4 py-2 text-center font-bold bg-white w-32">KUMULATIF</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {format === 2 && tableRows.map((row) => (
-                        <tr key={row.id}>
-                          <td className="border border-black px-4 py-2">{row.category}</td>
-                          {displayColumns.map(col => (
-                            <td key={col} className="border border-black px-4 py-2 text-center">
-                              {(col === selectedMonth ? row.current : row.prev).toLocaleString()}
-                            </td>
-                          ))}
-                          <td className="border border-black px-4 py-2 text-center">{row.cum.toLocaleString()}</td>
-                        </tr>
-                      ))}
-                      {format === 3 && tableRows.map(row => (
-                        <tr key={row.raw.id}>
-                          <td className="border border-black px-4 py-2">{row.category}</td>
-                          <td className="border border-black px-4 py-2 text-center">{row.col1.toLocaleString()}</td>
-                          <td className="border border-black px-4 py-2 text-center">{row.col2.toLocaleString()}</td>
-                          <td className="border border-black px-4 py-2 text-center">{row.col3}</td>
-                        </tr>
-                      ))}
-                      {format !== 3 && (
-                        <tr className="font-bold">
-                          <td className="border border-black px-4 py-2">JUMLAH</td>
-                          {displayColumns.map(col => (
-                            <td key={col} className="border border-black px-4 py-2 text-center">
-                              {(col === selectedMonth ? grandTotalCurrent : grandTotalPrev).toLocaleString()}
-                            </td>
-                          ))}
-                          <td className="border border-black px-4 py-2 text-center">{grandTotalCum.toLocaleString()}</td>
-                        </tr>
-                      )}
-                      {format === 3 && (
-                        <tr className="font-bold">
-                          <td className="border border-black px-4 py-2">JUMLAH</td>
-                          <td className="border border-black px-4 py-2 text-center">{grandTotalCurrent.toLocaleString()}</td>
-                          <td className="border border-black px-4 py-2 text-center">-</td>
-                          <td className="border border-black px-4 py-2 text-center">-</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-
-                  {format === 2 && entries.length > 0 && (
-                    <div className="chart-container mb-6">
-                      <h3 className="text-md font-bold mb-3 text-gray-800">Graf: {sectionName} – {selectedMonth}</h3>
-                      <div className="chart-with-axis">
-                        <div className="y-axis">
-                          {(() => {
-                            const values = entries.map(i => i[selectedMonth] || 0);
-                            const max = Math.max(...values, 1);
-                            const ticks = [0, Math.round(max*0.25), Math.round(max*0.5), Math.round(max*0.75), max];
-                            return ticks.slice().reverse().map(tick => <span key={tick}>{tick.toLocaleString()}</span>);
-                          })()}
-                        </div>
-                        <div className="bars-container">
-                          {entries.map((item) => {
-                            const current = item[selectedMonth] || 0;
-                            const maxVal = Math.max(...entries.map(i => i[selectedMonth] || 0), 1);
-                            return (
-                              <div key={item.id} className="bar-wrapper">
-                                <div className="bar-value">{current.toLocaleString()}</div>
-                                <div className="bar" style={{ height: `${(current/maxVal)*180}px` }}></div>
-                                <div className="bar-label">{item.item}</div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                      <div className="flex justify-center mt-3 text-xs">
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500"></div> {selectedMonth}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="ulasan-section">
-                    <h3 className="font-bold mb-2">ULASAN</h3>
-                    <textarea 
-                      value={sectionComments[sectionName] || ''} 
-                      onChange={(e) => updateSectionComment(sectionName, e.target.value)}
-                      disabled={currentUser.role === 'view'}
-                      rows="3" 
-                      className={`w-full border border-black p-3 rounded bg-white resize-y ${currentUser.role === 'view' ? 'bg-gray-100' : ''}`} 
-                      placeholder={currentUser.role === 'view' ? 'Ulasan hanya boleh dibaca' : 'Taip ulasan...'}
-                      readOnly={currentUser.role === 'view'}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} currentUser={currentUser}
+          currentView={currentView} setCurrentView={setCurrentView} onLogout={handleLogout} />
+        <main className={`transition-all ${sidebarOpen?'ml-64':'ml-20'} p-8`}>
+          <div className="max-w-7xl mx-auto">
+            {currentView==='dashboard' && <DashboardView dataEntries={dataEntries} kpis={kpis} />}
+            {currentView==='data-tahunan' && currentUser.role==='admin' && (
+              <DataTahunanView
+                sectionOrder={sectionOrder}
+                organizedSections={organizedSections}
+                moveItem={moveItem}
+                addHeading={addHeading}
+                addSubheading={addSubheading}
+                addNewSection={addNewSection}
+                addHeadingAndSection={addHeadingAndSection}
+                addSubheadingAndSection={addSubheadingAndSection}
+                renameOrderItem={renameOrderItem}
+                deleteOrderItem={deleteOrderItem}
+                addRowToSection={addRowToSection}
+                deleteEntry={deleteEntry}
+                updateEntry={updateEntry}
+                updateMonthValue={updateMonthValue}
+                updateFormat3Headers={updateFormat3Headers}
+              />
+            )}
+            {currentView==='laporan-bulanan' && (currentUser.role==='admin'||currentUser.role==='editor') && (
+              <LaporanBulananView
+                organizedSections={organizedSections}
+                sectionOrder={sectionOrder}
+                sectionComments={sectionComments}
+                updateSectionComment={updateSectionComment}
+                role={currentUser.role}
+              />
+            )}
+            {currentView==='urus-pengguna' && currentUser.role==='admin' && (
+              <UrusPenggunaView users={users} setUsers={setUsers} currentUser={currentUser} />
+            )}
           </div>
-        );
-      };
+        </main>
+      </div>
+    );
+  }
 
-      return (
-        <div className="min-h-screen bg-gray-50">
-          <Sidebar />
-          <main className={`transition-all ${sidebarOpen ? 'ml-64' : 'ml-20'} p-8`}>
-            <div className="max-w-7xl mx-auto">
-              {currentView === 'dashboard' && <DashboardView />}
-              {currentView === 'data-tahunan' && currentUser.role === 'admin' && <DataTahunanView />}
-              {currentView === 'laporan-bulanan' && (currentUser.role === 'admin' || currentUser.role === 'editor') && <LaporanBulananView />}
-            </div>
-          </main>
-        </div>
-      );
-    }
-
-    ReactDOM.render(<App />, document.getElementById('root'));
-  </script>
+  ReactDOM.render(<App />, document.getElementById('root'));
+</script>
 </body>
 </html>
